@@ -607,23 +607,70 @@ TYPED_TEST(DequeTest, SwapLarge) {
 // --- Iterator Interface Tests ---
 // Test the iterators and related methods of both classes
 // Methods that use iterators are also tested here
+// CAUTION: You can't copmare iterators the classic way
 
 template<typename C>
 class IteratorTest : public testing::Test {
 	protected:
-		typedef typename C::value_type T;
-		typedef typename C::iterator I;
+		typedef typename C::value_type value_type;
+		typedef typename C::iterator iterator;
+		typedef typename C::const_iterator const_iterator;
 		C x, y;
-		I i, j;
+		iterator i, j;
+
+		void SetUpBegin() {
+			x.push_back(0);
+			x.push_back(1);
+			x.push_back(2);
+			y = x;
+
+			i = x.begin();
+			j = y.begin();
+		}
+
+		void SetUpEnd() {
+			x.push_back(0);
+			x.push_back(1);
+			x.push_back(2);
+			y = x;
+
+			i = x.end();
+			j = y.end();
+		}
 };
 
 TYPED_TEST_CASE(IteratorTest, MyDeques);
 
-// --- operator == ---
+// --- iterator constructor ---
 // TODO
 
-// --- const_iterator constructor ---
-// TODO
+// --- iterator operator == ---
+
+TYPED_TEST(IteratorTest, IteratorEqualsSelf) {
+	this->SetUpBegin();
+	ASSERT_TRUE(this->i == this->i);
+}
+
+TYPED_TEST(IteratorTest, IteratorNotEqualBeginAndEnd) {
+	this->SetUpBegin();
+	this->j = this->x.end();
+	ASSERT_FALSE(this->i == this->j);
+}
+
+TYPED_TEST(IteratorTest, IteratorEqualsSelfEnd) {
+	this->SetUpEnd();
+	ASSERT_TRUE(this->i == this->i);
+}
+
+TYPED_TEST(IteratorTest, IteratorEqualsEnd) {
+	this->SetUpEnd();
+	ASSERT_FALSE(this->i == this->j);
+}
+
+TYPED_TEST(IteratorTest, IteratorNotEquals) {
+	this->SetUpBegin();
+	ASSERT_FALSE(this->i == this->j);
+}
 
 // --- operator * ---
 // TODO
@@ -638,6 +685,42 @@ TYPED_TEST_CASE(IteratorTest, MyDeques);
 // TODO
 
 // --- operator -= ---
+// TODO
+
+// --- const_iterator constructor ---
+// TODO
+
+// --- const_iterator operator == ---
+
+TYPED_TEST(IteratorTest, ConstIteratorEqualsSelf) {
+	ASSERT_TRUE(this->x.begin() == this->x.begin());
+}
+
+TYPED_TEST(IteratorTest, ConstIteratorEqualsSelfEnd) {
+	ASSERT_TRUE(this->x.end() == this->x.end());
+}
+
+TYPED_TEST(IteratorTest, ConstIteratorNotEquals) {
+	ASSERT_FALSE(this->x.begin() == this->y.begin());
+}
+
+TYPED_TEST(IteratorTest, ConstIteratorNotEqualsEnd) {
+	ASSERT_FALSE(this->x.end() == this->y.end());
+}
+
+// --- const_iterator operator * ---
+// TODO
+
+// --- const_terartor operator ++ pre ---
+// TODO
+
+// --- const_iterator operator -- pre ---
+// TODO
+
+// --- const_iterator operator += ---
+// TODO
+
+// --- const_iterator operator -= ---
 // TODO
 
 // --- begin ---

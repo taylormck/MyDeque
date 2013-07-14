@@ -1,7 +1,7 @@
 cs378-deque
 ===========
 
-Implement the class MyDeque to emulate std::deque
+Implement the class **MyDeque** to emulate **std::deque**.
 
 A **deque** is an attractive compromise between a **vector** and a **list**.
 

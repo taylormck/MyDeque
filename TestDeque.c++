@@ -45,7 +45,6 @@ class DequeTest : public testing::Test {
 		typedef typename C::value_type T;
 		std::allocator<T> a;
 		C x, y, allocator_constructed, size_construced, copy_constructed;
-		C* pointed;
 
 		// This needs to be large enough that the data will span past
 		// a single array
@@ -56,16 +55,8 @@ class DequeTest : public testing::Test {
 			allocator_constructed(a),
 			size_construced(10, 5),
 			copy_constructed(size_construced),
-			pointed(new C()),
 			s(10000)
 		{}
-
-		// If we delete pointed during a test, make sure to
-		// set it to NULL
-		~DequeTest() {
-			if (pointed)
-				delete pointed;
-		}
 
 		void SetSame() {
 			x = C (10, 5);
@@ -310,7 +301,7 @@ TYPED_TEST(DequeTest, BackWhenSizeIsOne) {
 	EXPECT_EQ(9, this->x.back());
 }
 
-TYPED_TEST(DequeTest, BackWhenSizeIsTen) {
+TYPED_TEST(DequeTest, BackWhenSizeIsSmall) {
 	this->SetSame();
 	ASSERT_EQ(10, this->x.size());
 	this->x.push_back(9);
@@ -370,7 +361,7 @@ TYPED_TEST(DequeTest, FrontWhenSizeIsOne) {
 	ASSERT_EQ(9, this->x.front());
 }
 
-TYPED_TEST(DequeTest, FrontWhenSizeIsTen) {
+TYPED_TEST(DequeTest, FrontWhenSizeIsSmall) {
 	this->SetSame();
 	ASSERT_EQ(10, this->x.size());
 	this->x.push_front(9);
@@ -385,27 +376,233 @@ TYPED_TEST(DequeTest, FrontWhenSizeIsLarge) {
 }
 
 // --- pop_back ---
-// TODO
 
+TYPED_TEST(DequeTest, PopBackWhenSizeIsOne) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.push_back(0);
+	ASSERT_EQ(1, this->x.size());
+	this->x.pop_back();
+	ASSERT_EQ(0, this->x.size());
+}
+
+TYPED_TEST(DequeTest, PopBackWhenSizeIsSmall) {
+	this->SetSame();
+	EXPECT_EQ(10, this->x.size());
+	this->x.front() = 0;
+	this->x.back() = 0;
+
+	this->x.pop_back();
+	EXPECT_EQ(9, this->x.size());
+
+	EXPECT_EQ(0, this->x.front());
+	EXPECT_NE(0, this->x.back());
+}
+
+TYPED_TEST(DequeTest, PopBackWhenSizeIsLarge) {
+	this->SetLarge();
+	EXPECT_EQ(this->s, this->x.size());
+	this->x.front() = 0;
+	this->x.back() = 0;
+
+	this->x.pop_back();
+	EXPECT_EQ(this->s - 1, this->x.size());
+
+	EXPECT_EQ(0, this->x.front());
+	EXPECT_NE(0, this->x.back());
+}
 
 // --- pop_front ---
-// TODO
+
+TYPED_TEST(DequeTest, PopFrontWhenSizeIsOne) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.push_front(0);
+	ASSERT_EQ(1, this->x.size());
+	this->x.pop_front();
+	ASSERT_EQ(0, this->x.size());
+}
+
+TYPED_TEST(DequeTest, PopFrontWhenSizeIsSmall) {
+	this->SetSame();
+	EXPECT_EQ(10, this->x.size());
+	this->x.front() = 0;
+	this->x.back() = 0;
+
+	this->x.pop_front();
+	EXPECT_EQ(9, this->x.size());
+
+	EXPECT_NE(0, this->x.front());
+	EXPECT_EQ(0, this->x.back());
+}
+
+TYPED_TEST(DequeTest, PopFrontWhenSizeIsLarge) {
+	this->SetLarge();
+	EXPECT_EQ(this->s, this->x.size());
+	this->x.front() = 0;
+	this->x.back() = 0;
+
+	this->x.pop_front();
+	EXPECT_EQ(this->s - 1, this->x.size());
+
+	EXPECT_NE(0, this->x.front());
+	EXPECT_EQ(0, this->x.back());
+}
+
 
 // --- push_back ---
-// TODO
+
+TYPED_TEST(DequeTest, PushBackSizeIsZero) {
+	this->x.push_back(1);
+	EXPECT_EQ(1, this->x.back());
+}
+
+TYPED_TEST(DequeTest, PushBackSizeIsSmall) {
+	this->SetSame();
+	this->x.push_back(1);
+	EXPECT_EQ(1, this->x.back());
+}
+
+TYPED_TEST(DequeTest, PushBackSizeIsLarge) {
+	this->SetLarge();
+	this->x.push_back(1);
+	EXPECT_EQ(1, this->x.back());
+}
+
 
 // --- push_front ---
-// TODO
+
+TYPED_TEST(DequeTest, PushFrontSizeIsZero) {
+	this->x.push_front(1);
+	EXPECT_EQ(1, this->x.front());
+}
+
+TYPED_TEST(DequeTest, PushFrontSizeIsSmall) {
+	this->SetSame();
+	this->x.push_front(1);
+	EXPECT_EQ(1, this->x.front());
+}
+
+TYPED_TEST(DequeTest, PushFrontSizeIsLarge) {
+	this->SetLarge();
+	this->x.push_front(1);
+	EXPECT_EQ(1, this->x.front());
+}
 
 // --- resize ---
-// TODO
+
+TYPED_TEST(DequeTest, ResizeGrow) {
+	this->SetSame();
+	ASSERT_EQ(10, this->x.size());
+	ASSERT_EQ(5, this->x.back());
+	this->x.resize(11, 9);
+	ASSERT_EQ(11, this->x.size());
+	ASSERT_EQ(9, this->x.back());
+}
+
+TYPED_TEST(DequeTest, ResizeShrink) {
+	this->SetSame();
+	ASSERT_EQ(10, this->x.size());
+	ASSERT_EQ(5, this->x.back());
+	this->x.resize(4, 9);
+	ASSERT_EQ(4, this->x.size());
+	ASSERT_EQ(5, this->x.back());
+}
+
+TYPED_TEST(DequeTest, ResizeGrowLarge) {
+	this->SetLarge();
+	ASSERT_EQ(this->s, this->x.size());
+	ASSERT_EQ(5, this->x.back());
+	this->x.resize(this->s * 2, 9);
+	ASSERT_EQ(this->s * 2, this->x.size());
+	ASSERT_EQ(9, this->x.back());
+}
+
+TYPED_TEST(DequeTest, ResizeShrinkLarge) {
+	this->SetLarge();
+	ASSERT_EQ(this->s, this->x.size());
+	ASSERT_EQ(5, this->x.back());
+	this->x.resize(this->s / 2, 9);
+	ASSERT_EQ(this->s / 2, this->x.size());
+	ASSERT_EQ(5, this->x.back());
+}
 
 // --- size ---
-// TODO
+
+TYPED_TEST(DequeTest, SizeIsZero) {
+	ASSERT_EQ(0, this->x.size());
+}
+
+TYPED_TEST(DequeTest, SizeIsSmall) {
+	this->SetSame();
+	EXPECT_EQ(10, this->x.size());
+}
+
+TYPED_TEST(DequeTest, SizeIsLarge) {
+	this->SetLarge();
+	EXPECT_EQ(this->s, this->x.size());
+}
+
 
 // --- swap ---
-// TODO
 
+TYPED_TEST(DequeTest, SwapEmpty) {
+	EXPECT_EQ(0, this->x.size());
+	EXPECT_EQ(0, this->y.size());
+	std::swap(this->x, this->y);  // This will call x.swap
+	EXPECT_EQ(0, this->x.size());
+	EXPECT_EQ(0, this->y.size());
+}
+
+TYPED_TEST(DequeTest, SwapSmall) {
+	this->SetDifferent();
+	EXPECT_EQ(10, this->x.size());
+	EXPECT_EQ(10, this->y.size());
+	EXPECT_EQ(5, this->x[5]);
+	EXPECT_EQ(3, this->y[5]);
+
+	std::swap(this->x, this->y);  // This will call x.swap
+
+	EXPECT_EQ(10, this->x.size());
+	EXPECT_EQ(10, this->y.size());
+	EXPECT_EQ(3, this->x[5]);
+	EXPECT_EQ(5, this->y[5]);
+
+	this->y.push_back(5);
+	EXPECT_EQ(11, this->y.size());
+
+	std::swap(this->x, this->y);
+
+	EXPECT_EQ(11, this->x.size());
+	EXPECT_EQ(10, this->y.size());
+	EXPECT_EQ(5, this->x[5]);
+	EXPECT_EQ(3, this->y[5]);
+}
+
+TYPED_TEST(DequeTest, SwapLarge) {
+	this->SetLarge();
+	this->y[5] = 3;
+
+	EXPECT_EQ(this->s, this->x.size());
+	EXPECT_EQ(this->s, this->y.size());
+	EXPECT_EQ(5, this->x[5]);
+	EXPECT_EQ(3, this->y[5]);
+
+	std::swap(this->x, this->y);  // This will call x.swap
+
+	EXPECT_EQ(this->s, this->x.size());
+	EXPECT_EQ(this->s, this->y.size());
+	EXPECT_EQ(3, this->x[5]);
+	EXPECT_EQ(5, this->y[5]);
+
+	this->y.push_back(5);
+	EXPECT_EQ(this->s + 1, this->y.size());
+
+	std::swap(this->x, this->y);
+
+	EXPECT_EQ(this->s + 1, this->x.size());
+	EXPECT_EQ(this->s, this->y.size());
+	EXPECT_EQ(5, this->x[5]);
+	EXPECT_EQ(3, this->y[5]);
+}
 
 // --- Iterator Interface Tests ---
 // Test the iterators and related methods of both classes

@@ -1,5 +1,5 @@
 all:
-  make TestDeque
+	make TestDeque
 
 clean:
 	rm -f Deque.log

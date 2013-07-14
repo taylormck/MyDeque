@@ -29,3 +29,9 @@ TestDeque: Deque.h TestDeque.c++
 
 TestDeque.out: TestDeque
 	valgrind TestDeque > TestDeque.out
+
+test: TestDeque
+	TestDeque
+	
+testv: TestDeque
+	valgrind TestDeque

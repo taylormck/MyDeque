@@ -11,3 +11,11 @@
 *.lai
 *.la
 *.a
+
+# Binaries
+TestDeque
+
+# Eclipse files
+.project
+.settings
+.cproject

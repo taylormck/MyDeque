@@ -31,6 +31,7 @@
 template <typename C>
 class DequeTest : public testing::Test {
 	protected:
+		typedef typename C::value_type T;
 		C x, y;
 
 		void SetSame() {
@@ -158,12 +159,22 @@ TYPED_TEST(DequeTest, GreaterThanEqualSize) {
 	EXPECT_GE(this->y, this->x);
 }
 
+// --- Allocator Constructor ---
+
+TYPED_TEST(DequeTest, AllocatorConstructorEmpty) {
+	EXPECT_EQ(0, this->x.size());
+	EXPECT_EQ(0, this->y.size());
+}
+
+
+
 // --- Iterator Interface Tests ---
 // Test the iterators of both classes
 
 template<typename C>
 class IteratorTest : public testing::Test {
 	protected:
+		typedef typename C::value_type T;
 		typedef typename C::iterator I;
 		C x, y;
 		I i, j;

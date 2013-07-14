@@ -25,12 +25,13 @@
 // Not testing the code we didn't write
 // destroy, unitialized_copy, unitialized_fill
 
+// --- Deque Interface tests ---
 // These are tests that both deques should pass
+
 template <typename C>
 class DequeTest : public testing::Test {
 	protected:
-		C x;
-		C y;
+		C x, y;
 
 		void SetSame() {
 			x = C (10, 5);
@@ -41,10 +42,22 @@ class DequeTest : public testing::Test {
 			SetSame();
 			y[5] = 3;
 		}
+
+		void SetLessContent() {
+			x = C (10, 4);
+			y = C (10, 5);
+		}
+
+		void SetLessSize() {
+			x = C(5, 5);
+			y = C(10, 5);
+		}
 };
 
-typedef testing::Types<std::deque<int>, MyDeque<int> > MyTypes;
-TYPED_TEST_CASE(DequeTest, MyTypes);
+typedef testing::Types<std::deque<int>, MyDeque<int> > MyDeques;
+TYPED_TEST_CASE(DequeTest, MyDeques);
+
+// --- operator == ---
 
 TYPED_TEST(DequeTest, ContentEqualsOnEmpty) {
 	EXPECT_EQ(this->x, this->y);
@@ -73,14 +86,100 @@ TYPED_TEST(DequeTest, ContentNotEqual) {
 	EXPECT_NE(this->x, this->y);
 }
 
-TYPED_TEST(DequeTest, ContentNotEqualSize) {
+TYPED_TEST(DequeTest, SizeNotEqualSize) {
 	this->SetSame();
 	this->x.push_back(0);
 	EXPECT_NE(this->x, this->y);
 }
 
-template<typename I>
-class DequeIteratorTest : public testing::Test {
+TYPED_TEST(DequeTest, ContentAndSizeNotEqual) {
+	this->SetSame();
+	this->x.push_back(0);
+	EXPECT_NE(this->x, this->y);
+}
+
+// --- operator < ---
+
+TYPED_TEST(DequeTest, LessThanEqualEmpty) {
+	EXPECT_LE(this->x, this->y);
+}
+
+TYPED_TEST(DequeTest, LessThan) {
+	this->SetLessContent();
+	EXPECT_LT(this->x, this->y);
+}
+
+TYPED_TEST(DequeTest, LessThanEqual) {
+	this->SetLessContent();
+	EXPECT_LE(this->x, this->y);
+}
+
+TYPED_TEST(DequeTest, LessThanEqualSelf) {
+	this->SetLessContent();
+	EXPECT_LE(this->x, this->x);
+}
+
+TYPED_TEST(DequeTest, LessThanSize) {
+	this->SetLessSize();
+	EXPECT_LE(this->x, this->y);
+}
+
+TYPED_TEST(DequeTest, LessThanEqualSize) {
+	this->SetLessSize();
+	EXPECT_LE(this->x, this->y);
+}
+
+TYPED_TEST(DequeTest, GreaterThanEqualEmpty) {
+	EXPECT_GE(this->y, this->x);
+}
+
+TYPED_TEST(DequeTest, GreaterThan) {
+	this->SetLessContent();
+	EXPECT_GT(this->y, this->x);
+}
+
+TYPED_TEST(DequeTest, GreaterThanEqual) {
+	this->SetLessContent();
+	EXPECT_GE(this->y, this->x);
+}
+
+TYPED_TEST(DequeTest, GreaterThanEqualSelf) {
+	this->SetLessContent();
+	EXPECT_GE(this->x, this->x);
+}
+
+TYPED_TEST(DequeTest, GreaterThanSize) {
+	this->SetLessSize();
+	EXPECT_GT(this->y, this->x);
+}
+
+TYPED_TEST(DequeTest, GreaterThanEqualSize) {
+	this->SetLessSize();
+	EXPECT_GE(this->y, this->x);
+}
+
+// --- Iterator Interface Tests ---
+// Test the iterators of both classes
+
+template<typename C>
+class IteratorTest : public testing::Test {
 	protected:
-		// Stuff
+		typedef typename C::iterator I;
+		C x, y;
+		I i, j;
 };
+
+TYPED_TEST_CASE(IteratorTest, MyDeques);
+
+
+// --- MyDeque Implementation Tests ---
+// These are tests tailored to MyDeque
+
+template<typename T>
+class MyDequeTest : public testing::Test {
+	protected:
+		MyDeque<T> x, y;
+};
+
+typedef testing::Types<int, char, std::string> MyTypes;
+TYPED_TEST_CASE(MyDequeTest, MyTypes);

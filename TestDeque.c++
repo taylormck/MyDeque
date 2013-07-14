@@ -7,7 +7,17 @@
 #include <stdexcept> // invalid_argument
 #include <string>    // ==
 
+// Stuff in deque.h so our defines won't mess with stuff
+#include <cassert>
+#include <iterator>
+#include <memory>
+#include <utility>
+
 #include "gtest/gtest.h" // Google Test framework
+
+#define class struct
+#define protected public
+#define private public
 
 #include "Deque.h"
 
@@ -68,3 +78,9 @@ TYPED_TEST(DequeTest, ContentNotEqualSize) {
 	this->x.push_back(0);
 	EXPECT_NE(this->x, this->y);
 }
+
+template<typename I>
+class DequeIteratorTest : public testing::Test {
+	protected:
+		// Stuff
+};

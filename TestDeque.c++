@@ -32,7 +32,15 @@ template <typename C>
 class DequeTest : public testing::Test {
 	protected:
 		typedef typename C::value_type T;
-		C x, y;
+		std::allocator<T> a;
+		C x, y, allocator_constructed, size_construced, copy_constructed;
+
+		DequeTest() :
+			x(), y(),
+			allocator_constructed(a),
+			size_construced(10, 5),
+			copy_constructed(size_construced)
+		{}
 
 		void SetSame() {
 			x = C (10, 5);
@@ -72,12 +80,10 @@ TYPED_TEST(DequeTest, ContentEqualsSmall) {
 TYPED_TEST(DequeTest, ContentEqualsRough) {
 	this->SetSame();
 
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 100; ++i)
 		this->x.push_back(i);
-	}
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 100; ++i)
 		this->x.pop_back();
-	}
 
 	EXPECT_EQ(this->x, this->y);
 }
@@ -159,14 +165,38 @@ TYPED_TEST(DequeTest, GreaterThanEqualSize) {
 	EXPECT_GE(this->y, this->x);
 }
 
-// --- Allocator Constructor ---
+// --- Constructors ---
 
-TYPED_TEST(DequeTest, AllocatorConstructorEmpty) {
+TYPED_TEST(DequeTest, AllocatorConstructor) {
 	EXPECT_EQ(0, this->x.size());
 	EXPECT_EQ(0, this->y.size());
 }
 
+TYPED_TEST(DequeTest, SizedConstructor) {
+	ASSERT_EQ(10, this->size_construced.size());
+	for (int i = 0; i < 10; ++i)
+		EXPECT_EQ(5, this->size_construced[i]);
+}
 
+TYPED_TEST(DequeTest, CopyConstructor) {
+	ASSERT_EQ(this->size_construced.size(), this->copy_constructed.size());
+
+	for(unsigned int i = 0; i < this->size_construced.size(); ++i)
+		EXPECT_EQ(this->size_construced[i], this->copy_constructed[i]);
+}
+
+// --- Copy Assignment ---
+
+TYPED_TEST(DequeTest, CopyAssignment) {
+	this->SetDifferent();
+	EXPECT_EQ(3, this->y[5]);
+
+	this->y = this->x;
+
+	ASSERT_EQ(this->x.size(), this->y.size());
+	for (unsigned int i = 0; i < this->x.size(); ++i)
+		EXPECT_EQ(this->x[i], this->y[i]);
+}
 
 // --- Iterator Interface Tests ---
 // Test the iterators of both classes

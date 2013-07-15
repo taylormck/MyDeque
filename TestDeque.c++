@@ -738,7 +738,7 @@ TYPED_TEST(IteratorTest, IteratorPreIncrementNoTemp) {
 }
 
 // --- operator -- pre ---
-// TODO
+
 TYPED_TEST(IteratorTest, IteratorPreDecrement) {
 	this->SetUpEnd();
 	ASSERT_TRUE((this->x.end() - 1) == (--(this->i)));
@@ -783,7 +783,7 @@ TYPED_TEST(IteratorTest, ConstIteratorNotEqualsEnd) {
 }
 
 // --- const_iterator operator * ---
-// TODO
+
 TYPED_TEST(IteratorTest, ConstIteratorDereferenceI) {
 	this->SetUpBegin();
 	typename TestFixture::const_iterator ci = this->i;
@@ -837,7 +837,7 @@ TYPED_TEST(IteratorTest, ConstIteratorMinusEqualStepped) {
 }
 
 // --- const_iterartor operator ++ pre ---
-// TODO
+
 TYPED_TEST(IteratorTest, ConstIteratorPreIncrement) {
 	this->SetUpBegin();
 	typename TestFixture::const_iterator ci = this->i;
@@ -853,7 +853,7 @@ TYPED_TEST(IteratorTest, ConstIteratorPreIncrementNoTemp) {
 
 
 // --- const_iterator operator -- pre ---
-// TODO
+
 TYPED_TEST(IteratorTest, ConstIteratorPreDecrement) {
 	this->SetUpEnd();
 	typename TestFixture::const_iterator ci = this->i;
@@ -869,10 +869,19 @@ TYPED_TEST(IteratorTest, ConstIteratorPreDecrementNoTemp) {
 
 
 // --- begin ---
-// TODO
+
+TYPED_TEST(IteratorTest, Begin) {
+	this->SetUpBegin();
+	ASSERT_TRUE(&*(this->x.begin()) == &(this->x)[0]);
+}
 
 // --- end ---
 // TODO
+TYPED_TEST(IteratorTest, End) {
+	this->SetUpBegin();
+	ASSERT_TRUE(&*(this->x.end()) == (&(this->x)[(this->x.size() - 1)]) + 1);
+}
+
 
 // --- erase ---
 // TODO
@@ -882,6 +891,7 @@ TYPED_TEST(IteratorTest, ConstIteratorPreDecrementNoTemp) {
 
 // --- MyDeque Implementation Tests ---
 // These are tests tailored to MyDeque
+// Here, I can test implementation-dependent details of MyDeque
 
 template<typename T>
 class MyDequeTest : public testing::Test {

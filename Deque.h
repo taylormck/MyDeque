@@ -242,7 +242,7 @@ class MyDeque {
 				 */
 				iterator(/* <your arguments> */) {
 					// <your code>
-					assert(valid());
+					// assert(valid());
 				}
 
 				// Default copy, destructor, and copy assignment.
@@ -771,7 +771,7 @@ class MyDeque {
 		 */
 		iterator insert(iterator, const_reference) {
 			// <your code>
-			assert(valid());
+			// assert(valid());
 			return iterator();
 		}
 

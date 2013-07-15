@@ -725,7 +725,7 @@ TYPED_TEST(IteratorTest, IteratorPlusEqualStepped) {
 
 
 // --- operator ++ pre ---
-// TODO
+
 TYPED_TEST(IteratorTest, IteratorPreIncrement) {
 	this->SetUpBegin();
 	ASSERT_TRUE((this->x.begin() + 1) == (++(this->i)));
@@ -739,6 +739,17 @@ TYPED_TEST(IteratorTest, IteratorPreIncrementNoTemp) {
 
 // --- operator -- pre ---
 // TODO
+TYPED_TEST(IteratorTest, IteratorPreDecrement) {
+	this->SetUpEnd();
+	ASSERT_TRUE((this->x.end() - 1) == (--(this->i)));
+}
+
+TYPED_TEST(IteratorTest, IteratorPreDecrementNoTemp) {
+	this->SetUpEnd();
+	typename TestFixture::iterator ti = --(this->i);
+	ASSERT_TRUE(ti == (this->i));
+}
+
 
 // --- const_iterator constructor ---
 // TODO
@@ -843,6 +854,19 @@ TYPED_TEST(IteratorTest, ConstIteratorPreIncrementNoTemp) {
 
 // --- const_iterator operator -- pre ---
 // TODO
+TYPED_TEST(IteratorTest, ConstIteratorPreDecrement) {
+	this->SetUpEnd();
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_TRUE((this->x.end() - 1) == (--ci));
+}
+
+TYPED_TEST(IteratorTest, ConstIteratorPreDecrementNoTemp) {
+	this->SetUpEnd();
+	typename TestFixture::const_iterator ci = this->i;
+	typename TestFixture::const_iterator ti = --ci;
+	ASSERT_TRUE(ti == ci);
+}
+
 
 // --- begin ---
 // TODO

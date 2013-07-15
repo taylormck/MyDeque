@@ -889,9 +889,10 @@ TYPED_TEST(IteratorTest, ConstIteratorPreDecrementNoTemp) {
 
 TYPED_TEST(IteratorTest, ConstIteratorValidTest) {
 	this->SetUpBegin();
-	this->Push();
+	const typename TestFixture::const_iterator v = this->i;
 	typename TestFixture::const_iterator ci = this->i;
-	EXPECT_EQ(0, *ci);
+	this->Push();
+	ASSERT_TRUE(v == ci);
 }
 
 

@@ -224,6 +224,8 @@ TYPED_TEST(DequeTest, GreaterThanEqualLarge) {
 }
 
 // --- Constructors ---
+// TODO fix these tests to actually call the constructor
+// use TestFixture::C
 
 TYPED_TEST(DequeTest, AllocatorConstructor) {
 	EXPECT_EQ(0, this->x.size());
@@ -649,8 +651,7 @@ TYPED_TEST_CASE(IteratorTest, MyDeques);
 
 TYPED_TEST(IteratorTest, IteratorEqualsSelf) {
 	this->SetUpBegin();
-	typename TestFixture::const_iterator ci = this->i;
-	ASSERT_TRUE(ci == ci);
+	ASSERT_TRUE(this->i == this->i);
 }
 
 TYPED_TEST(IteratorTest, IteratorNotEqualBeginAndEnd) {
@@ -695,19 +696,29 @@ TYPED_TEST(IteratorTest, IteratorNotEquals) {
 // --- const_iterator operator == ---
 
 TYPED_TEST(IteratorTest, ConstIteratorEqualsSelf) {
-	ASSERT_TRUE(this->x.begin() == this->x.begin());
+	this->SetUpBegin();
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_TRUE(ci == ci);
 }
 
 TYPED_TEST(IteratorTest, ConstIteratorEqualsSelfEnd) {
-	ASSERT_TRUE(this->x.end() == this->x.end());
+	this->SetUpEnd();
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_TRUE(ci == ci);
 }
 
 TYPED_TEST(IteratorTest, ConstIteratorNotEquals) {
-	ASSERT_FALSE(this->x.begin() == this->y.begin());
+	this->SetUpBegin();
+	typename TestFixture::const_iterator ci = this->i;
+	typename TestFixture::const_iterator cj = this->j;
+	ASSERT_FALSE(ci == cj);
 }
 
 TYPED_TEST(IteratorTest, ConstIteratorNotEqualsEnd) {
-	ASSERT_FALSE(this->x.end() == this->y.end());
+	this->SetUpEnd();
+	typename TestFixture::const_iterator ci = this->i;
+	typename TestFixture::const_iterator cj = this->j;
+	ASSERT_FALSE(ci == cj);
 }
 
 // --- const_iterator operator * ---

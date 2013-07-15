@@ -103,6 +103,8 @@ class MyDeque {
 		typedef typename allocator_type::reference reference;
 		typedef typename allocator_type::const_reference const_reference;
 
+		typedef typename allocator_type::template rebind<pointer>::other pointer_allocator_type;
+
 	public:
 		// -----------
 		// operator ==
@@ -136,6 +138,8 @@ class MyDeque {
 		// ----
 
 		allocator_type _a;
+		pointer_allocator_type _pointer_a;
+		difference_type _size;
 
 		// <your data>
 

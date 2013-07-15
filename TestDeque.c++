@@ -687,16 +687,47 @@ TYPED_TEST(IteratorTest, IteratorDereferenceJ) {
 	ASSERT_EQ(0, *(this->j));
 }
 
+// --- operator += ---
+
+TYPED_TEST(IteratorTest, IteratorPlusEqualBeginToEnd) {
+	this->SetUpBegin();
+	ASSERT_TRUE(this->x.begin() == this->i);
+	ASSERT_TRUE(this->x.end() == (this->i += 3));
+}
+
+TYPED_TEST(IteratorTest, IteratorPlusEqualBeginStepped) {
+	this->SetUpBegin();
+	ASSERT_TRUE(this->i == this->x.begin());
+
+	for (unsigned int count = 0; count < this->x.size(); ++count)
+		ASSERT_FALSE(this->x.begin() == (this->i += 1));
+
+	ASSERT_TRUE(this->x.end() == this->i);
+}
+
+// --- operator -= ---
+// TODO
+TYPED_TEST(IteratorTest, IteratorMinusEqual) {
+	this->SetUpEnd();
+	ASSERT_TRUE(this->x.end() == this->i);
+	ASSERT_TRUE(this->x.begin() == (this->i -= 3));
+}
+
+TYPED_TEST(IteratorTest, IteratorPlusEqualStepped) {
+	this->SetUpEnd();
+	ASSERT_TRUE(this->i == this->x.end());
+
+	for (unsigned int count = 0; count < this->x.size() - 1; ++count)
+		ASSERT_FALSE(this->x.begin() == (this->i -= 1));
+
+	ASSERT_TRUE(this->x.begin() == (this->i -= 1));
+}
+
+
 // --- operator ++ pre ---
 // TODO
 
 // --- operator -- pre ---
-// TODO
-
-// --- operator += ---
-// TODO
-
-// --- operator -= ---
 // TODO
 
 // --- const_iterator constructor ---
@@ -744,17 +775,51 @@ TYPED_TEST(IteratorTest, ConstIteratorDereferenceJ) {
 	ASSERT_EQ(0, *cj);
 }
 
+// --- const_iterator operator += ---
 
-// --- const_terartor operator ++ pre ---
+TYPED_TEST(IteratorTest, ConstIteratorPlusEqualBeginToEnd) {
+	this->SetUpBegin();
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_TRUE(this->x.begin() == ci);
+	ASSERT_TRUE(this->x.end() == (ci += 3));
+}
+
+TYPED_TEST(IteratorTest, ConstIteratorPlusEqualBeginStepped) {
+	this->SetUpBegin();
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_TRUE(ci == this->x.begin());
+
+	for (unsigned int count = 0; count < this->x.size(); ++count)
+		ASSERT_FALSE(this->x.begin() == (ci += 1));
+
+	ASSERT_TRUE(this->x.end() == ci);
+}
+
+// --- const_iterator operator -= ---
+// TODO
+TYPED_TEST(IteratorTest, ConstIteratorMinusEqual) {
+	this->SetUpEnd();
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_TRUE(this->x.end() == ci);
+	ASSERT_TRUE(this->x.begin() == (ci -= 3));
+}
+
+TYPED_TEST(IteratorTest, ConstIteratorMinusEqualStepped) {
+	this->SetUpEnd();
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_TRUE(ci == this->x.end());
+
+	for (unsigned int count = 0; count < this->x.size() - 1; ++count)
+		ASSERT_FALSE(this->x.begin() == (ci -= 1));
+
+	ASSERT_TRUE(this->x.begin() == (ci -= 1));
+}
+
+
+// --- const_iterartor operator ++ pre ---
 // TODO
 
 // --- const_iterator operator -- pre ---
-// TODO
-
-// --- const_iterator operator += ---
-// TODO
-
-// --- const_iterator operator -= ---
 // TODO
 
 // --- begin ---

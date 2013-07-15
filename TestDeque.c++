@@ -934,15 +934,15 @@ TYPED_TEST(IteratorTest, Erase) {
 	EXPECT_EQ(1, *(this->x.begin()));
 }
 
-// TYPED_TEST(IteratorTest, EraseLarge) {
-// 	this->SetUpBegin();
-// 	this->Push();
-// 	typename TestFixture::difference_type expectedSize = 3 + 2 * this->s;
-// 	EXPECT_EQ(expectedSize, this->x.size());
-// 	this->i = this->x.erase(this->i);
-// 	EXPECT_EQ(expectedSize - 1, this->x.size());
-// 	EXPECT_EQ(1, *(this->i));
-// }
+TYPED_TEST(IteratorTest, EraseLarge) {
+	this->SetUpBegin();
+	this->Push();
+	typename TestFixture::difference_type expectedSize = 3 + 2 * this->s;
+	EXPECT_EQ(expectedSize, this->x.size());
+	EXPECT_EQ(0, *(this->i));
+	this->x.erase(this->x.begin() + this->s);
+	EXPECT_EQ(expectedSize - 1, this->x.size());
+}
 
 // --- insert ---
 // TODO

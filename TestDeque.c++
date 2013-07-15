@@ -617,6 +617,7 @@ class IteratorTest : public testing::Test {
 		typedef typename C::const_iterator const_iterator;
 		C x, y;
 		iterator i, j;
+		value_type m, n;
 
 		void SetUpBegin() {
 			x.push_back(0);
@@ -648,7 +649,8 @@ TYPED_TEST_CASE(IteratorTest, MyDeques);
 
 TYPED_TEST(IteratorTest, IteratorEqualsSelf) {
 	this->SetUpBegin();
-	ASSERT_TRUE(this->i == this->i);
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_TRUE(ci == ci);
 }
 
 TYPED_TEST(IteratorTest, IteratorNotEqualBeginAndEnd) {

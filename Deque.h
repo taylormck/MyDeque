@@ -430,6 +430,14 @@ class MyDeque {
 					assert(valid());
 				}
 
+                /**
+                 * <your documentation>
+                 */
+                const_iterator(iterator) {
+                    // <your code>
+                    assert(valid());
+                }
+
 				// Default copy, destructor, and copy assignment.
 				// const_iterator (const const_iterator&);
 				// ~const_iterator ();

@@ -609,7 +609,7 @@ TYPED_TEST(DequeTest, SwapLarge) {
 // --- Iterator Interface Tests ---
 // Test the iterators and related methods of both classes
 // Methods that use iterators are also tested here
-// CAUTION: You can't copmare iterators the classic way
+// CAUTION: You can't copmare iterators using *_EQ
 
 template<typename C>
 class IteratorTest : public testing::Test {
@@ -677,6 +677,15 @@ TYPED_TEST(IteratorTest, IteratorNotEquals) {
 
 // --- operator * ---
 // TODO
+TYPED_TEST(IteratorTest, IteratorDereferenceI) {
+	this->SetUpBegin();
+	ASSERT_EQ(0, *(this->i));
+}
+
+TYPED_TEST(IteratorTest, IteratorDereferenceJ) {
+	this->SetUpBegin();
+	ASSERT_EQ(0, *(this->j));
+}
 
 // --- operator ++ pre ---
 // TODO
@@ -723,6 +732,18 @@ TYPED_TEST(IteratorTest, ConstIteratorNotEqualsEnd) {
 
 // --- const_iterator operator * ---
 // TODO
+TYPED_TEST(IteratorTest, ConstIteratorDereferenceI) {
+	this->SetUpBegin();
+	typename TestFixture::const_iterator ci = this->i;
+	ASSERT_EQ(0, *ci);
+}
+
+TYPED_TEST(IteratorTest, ConstIteratorDereferenceJ) {
+	this->SetUpBegin();
+	typename TestFixture::const_iterator cj = this->j;
+	ASSERT_EQ(0, *cj);
+}
+
 
 // --- const_terartor operator ++ pre ---
 // TODO

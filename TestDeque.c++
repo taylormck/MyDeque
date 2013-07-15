@@ -905,7 +905,7 @@ TYPED_TEST(IteratorTest, Begin) {
 TYPED_TEST(IteratorTest, BeginLarge) {
 	this->SetUpBegin();
 	this->Push();
-	EXPECT_EQ(0, *(this->x.begin()));
+	EXPECT_EQ(9, *(this->x.begin()));
 	ASSERT_EQ(&*(this->x.begin()), &(this->x)[0]);
 }
 

@@ -617,9 +617,11 @@ class IteratorTest : public testing::Test {
 		typedef typename C::value_type value_type;
 		typedef typename C::iterator iterator;
 		typedef typename C::const_iterator const_iterator;
+		typedef typename C::difference_type difference_type;
 		C x, y;
 		iterator i, j;
 		value_type m, n;
+		difference_type s;
 
 		void SetUpBegin() {
 			x.push_back(0);
@@ -639,6 +641,13 @@ class IteratorTest : public testing::Test {
 
 			i = x.end();
 			j = y.end();
+		}
+
+		void Push() {
+			for (int i = 0; i < s / 3; ++i)
+				x.push_front(9);
+			for (int i = 0; i < s / 3; ++i)
+				x.push_back(9);
 		}
 };
 
@@ -750,6 +759,13 @@ TYPED_TEST(IteratorTest, IteratorPreDecrementNoTemp) {
 	ASSERT_TRUE(ti == (this->i));
 }
 
+// --- iterator --- valid through push_back and push_front ---
+
+TYPED_TEST(IteratorTest, IteratorValidTest) {
+	this->SetUpBegin();
+	this->Push();
+	EXPECT_EQ(0, *(this->i));
+}
 
 // --- const_iterator constructor ---
 // TODO
@@ -817,7 +833,7 @@ TYPED_TEST(IteratorTest, ConstIteratorPlusEqualBeginStepped) {
 }
 
 // --- const_iterator operator -= ---
-// TODO
+
 TYPED_TEST(IteratorTest, ConstIteratorMinusEqual) {
 	this->SetUpEnd();
 	typename TestFixture::const_iterator ci = this->i;
@@ -867,20 +883,46 @@ TYPED_TEST(IteratorTest, ConstIteratorPreDecrementNoTemp) {
 	ASSERT_TRUE(ti == ci);
 }
 
+// --- const_iterator --- valid through push_back and push_front ---
+
+TYPED_TEST(IteratorTest, ConstIteratorValidTest) {
+	this->SetUpBegin();
+	this->Push();
+	typename TestFixture::const_iterator ci = this->i;
+	EXPECT_EQ(0, *ci);
+}
+
 
 // --- begin ---
 
 TYPED_TEST(IteratorTest, Begin) {
 	this->SetUpBegin();
-	ASSERT_TRUE(&*(this->x.begin()) == &(this->x)[0]);
+	EXPECT_EQ(0, *(this->x.begin()));
+	ASSERT_EQ(&*(this->x.begin()), &(this->x)[0]);
+}
+
+TYPED_TEST(IteratorTest, BeginLarge) {
+	this->SetUpBegin();
+	this->Push();
+	EXPECT_EQ(0, *(this->x.begin()));
+	ASSERT_EQ(&*(this->x.begin()), &(this->x)[0]);
 }
 
 // --- end ---
-// TODO
+
 TYPED_TEST(IteratorTest, End) {
 	this->SetUpBegin();
-	ASSERT_TRUE(&*(this->x.end()) == (&(this->x)[(this->x.size() - 1)]) + 1);
+	EXPECT_EQ(2, *(this->x.end() - 1));
+	ASSERT_EQ(&*(this->x.end()), ((&(this->x)[(this->x.size() - 1)]) + 1));
 }
+
+TYPED_TEST(IteratorTest, EndLarge) {
+	this->SetUpBegin();
+	this->Push();
+	EXPECT_EQ(2, *(this->x.end() - 1));
+	ASSERT_EQ(&*(this->x.end()), ((&(this->x)[(this->x.size() - 1)]) + 1));
+}
+
 
 
 // --- erase ---
@@ -909,3 +951,5 @@ TYPED_TEST_CASE(MyDequeTest, MyTypes);
 // --- iterator::valid ---
 // TODO
 
+// --- const_iterator::valid ---
+// TODO

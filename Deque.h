@@ -137,9 +137,12 @@ class MyDeque {
 		// data
 		// ----
 
+		const static difference_type INNER_SIZE = 128;
+
 		allocator_type _a;
 		pointer_allocator_type _pointer_a;
 		difference_type _size;
+		difference_type _outer_array_size;
 
 		// <your data>
 

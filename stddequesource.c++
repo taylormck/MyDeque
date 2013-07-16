@@ -230,23 +230,23 @@ operator+(ptrdiff_t n, const DequeIterator<MyType, Reference, Pointer>& item)
 #ifdef __STL_USE_STD_ALLOCATORS
 
 // Base class for ordinary allocators.
-template <class MyType, class _Alloc, bool __is_static>
-class _Deque_alloc_base {
+template <class MyType, class Allocator, bool isStatic>
+class DequeAllocatorBase {
 public:
-  typedef typename _Alloc_traits<MyType,_Alloc>::allocator_type allocator_type;
+  typedef typename _Alloc_traits<MyType,Allocator>::allocator_type allocator_type;
   allocator_type get_allocator() const { return myAllocator; }
 
-  _Deque_alloc_base(const allocator_type& __a)
+  DequeAllocatorBase(const allocator_type& a)
     : myAllocator(__a), MmapAllocator(__a),
-      _M_map(0), MmapSize(0)
+      myMap(0), myMapSize(0)
   {}
   
 protected:
-  typedef typename _Alloc_traits<MyType*, _Alloc>::allocator_type
-          _Map_allocator_type;
+  typedef typename _Alloc_traits<MyType*, Allocator>::allocator_type
+          map_allocator_type;
 
   allocator_type      myAllocator;
-  _Map_allocator_type MmapAllocator;
+  map_allocator_type MmapAllocator;
 
   MyType* allocateRow() {
     return myAllocator.allocate(DequeBufferSize(sizeof(MyType)));
@@ -259,56 +259,56 @@ protected:
   void deallocateMap(MyType** rowToDelete, size_t n) 
     { MmapAllocator.deallocate(rowToDelete, n); }
 
-  MyType** _M_map;
-  size_t MmapSize;
+  MyType** myMap;
+  size_t myMapSize;
 };
 
 // Specialization for instanceless allocators.
-template <class MyType, class _Alloc>
-class _Deque_alloc_base<MyType, _Alloc, true>
+template <class MyType, class Allocator>
+class DequeAllocatorBase<MyType, Allocator, true>
 {
 public:
-  typedef typename _Alloc_traits<MyType,_Alloc>::allocator_type allocator_type;
+  typedef typename _Alloc_traits<MyType,Allocator>::allocator_type allocator_type;
   allocator_type get_allocator() const { return allocator_type(); }
 
-  _Deque_alloc_base(const allocator_type&) : _M_map(0), MmapSize(0) {}
+  DequeAllocatorBase(const allocator_type&) : myMap(0), myMapSize(0) {}
   
 protected:
-  typedef typename _Alloc_traits<MyType, _Alloc>::_Alloc_type _Node_alloc_type;
-  typedef typename _Alloc_traits<MyType*, _Alloc>::_Alloc_type _Map_alloc_type;
+  typedef typename _Alloc_traits<MyType, Allocator>::_Alloc_type NodeAllocatorType;
+  typedef typename _Alloc_traits<MyType*, Allocator>::_Alloc_type MapAllocatorType;
 
   MyType* allocateRow() {
-    return _Node_alloc_type::allocate(DequeBufferSize(sizeof(MyType)));
+    return NodeAllocatorType::allocate(DequeBufferSize(sizeof(MyType)));
   }
   void deallocateRow(MyType* rowToDelete) {
-    _Node_alloc_type::deallocate(rowToDelete, DequeBufferSize(sizeof(MyType)));
+    NodeAllocatorType::deallocate(rowToDelete, DequeBufferSize(sizeof(MyType)));
   }
   MyType** allocateMap(size_t n) 
-    { return _Map_alloc_type::allocate(n); }
+    { return MapAllocatorType::allocate(n); }
   void deallocateMap(MyType** rowToDelete, size_t n) 
-    { _Map_alloc_type::deallocate(rowToDelete, n); }
+    { MapAllocatorType::deallocate(rowToDelete, n); }
 
-  MyType** _M_map;
-  size_t MmapSize;
+  MyType** myMap;
+  size_t myMapSize;
 };
 
-template <class MyType, class _Alloc>
-class _Deque_base
-  : public _Deque_alloc_base<MyType,_Alloc,
-                              _Alloc_traits<MyType, _Alloc>::_S_instanceless>
+template <class MyType, class Allocator>
+class DequeBase
+  : public DequeAllocatorBase<MyType,Allocator,
+                              _Alloc_traits<MyType, Allocator>::_S_instanceless>
 {
 public:
-  typedef _Deque_alloc_base<MyType,_Alloc,
-                             _Alloc_traits<MyType, _Alloc>::_S_instanceless>
+  typedef DequeAllocatorBase<MyType,Allocator,
+                             _Alloc_traits<MyType, Allocator>::_S_instanceless>
           _Base;
   typedef typename _Base::allocator_type allocator_type;
   typedef DequeIterator<MyType,MyType&,MyType*>             iterator;
   typedef DequeIterator<MyType,const MyType&,const MyType*> const_iterator;
 
-  _Deque_base(const allocator_type& __a, size_t num_elements)
+  DequeBase(const allocator_type& a, size_t num_elements)
     : _Base(__a), _M_start(), _M_finish()
     { _M_initialize_map(num_elements); }
-  _Deque_base(const allocator_type& __a) 
+  DequeBase(const allocator_type& a) 
     : _Base(__a), _M_start(), _M_finish() {}
   ~_Deque_base();    
 
@@ -325,21 +325,21 @@ protected:
 
 #else /* __STL_USE_STD_ALLOCATORS */
 
-template <class MyType, class _Alloc>
-class _Deque_base {
+template <class MyType, class Allocator>
+class DequeBase {
 public:
   typedef DequeIterator<MyType,MyType&,MyType*>             iterator;
   typedef DequeIterator<MyType,const MyType&,const MyType*> const_iterator;
 
-  typedef _Alloc allocator_type;
+  typedef Allocator allocator_type;
   allocator_type get_allocator() const { return allocator_type(); }
 
-  _Deque_base(const allocator_type&, size_t num_elements)
-    : _M_map(0), MmapSize(0),  _M_start(), _M_finish() {
+  DequeBase(const allocator_type&, size_t num_elements)
+    : myMap(0), myMapSize(0),  _M_start(), _M_finish() {
     _M_initialize_map(num_elements);
   }
-  _Deque_base(const allocator_type&)
-    : _M_map(0), MmapSize(0),  _M_start(), _M_finish() {}
+  DequeBase(const allocator_type&)
+    : myMap(0), myMapSize(0),  _M_start(), _M_finish() {}
   ~_Deque_base();    
 
 protected:
@@ -349,54 +349,54 @@ protected:
   enum { _S_initial_map_size = 8 };
 
 protected:
-  MyType** _M_map;
-  size_t MmapSize;  
+  MyType** myMap;
+  size_t myMapSize;  
   iterator _M_start;
   iterator _M_finish;
 
-  typedef simple_alloc<MyType, _Alloc>  _Node_alloc_type;
-  typedef simple_alloc<MyType*, _Alloc> _Map_alloc_type;
+  typedef simple_alloc<MyType, Allocator>  NodeAllocatorType;
+  typedef simple_alloc<MyType*, Allocator> MapAllocatorType;
 
   MyType* allocateRow()
-    { return _Node_alloc_type::allocate(DequeBufferSize(sizeof(MyType))); }
+    { return NodeAllocatorType::allocate(DequeBufferSize(sizeof(MyType))); }
   void deallocateRow(MyType* rowToDelete)
-    { _Node_alloc_type::deallocate(rowToDelete, DequeBufferSize(sizeof(MyType))); }
+    { NodeAllocatorType::deallocate(rowToDelete, DequeBufferSize(sizeof(MyType))); }
   MyType** allocateMap(size_t n) 
-    { return _Map_alloc_type::allocate(n); }
+    { return MapAllocatorType::allocate(n); }
   void deallocateMap(MyType** rowToDelete, size_t n) 
-    { _Map_alloc_type::deallocate(rowToDelete, n); }
+    { MapAllocatorType::deallocate(rowToDelete, n); }
 };
 
 #endif /* __STL_USE_STD_ALLOCATORS */
 
-// Non-inline member functions from _Deque_base.
+// Non-inline member functions from DequeBase.
 
-template <class MyType, class _Alloc>
-_Deque_base<MyType,_Alloc>::~_Deque_base() {
+template <class MyType, class Allocator>
+_Deque_base<MyType,Allocator>::~_Deque_base() {
   if (_M_map) {
     _M_destroy_nodes(_M_start.currentRow, _M_finish.currentRow + 1);
-    deallocateMap(_M_map, MmapSize);
+    deallocateMap(_M_map, myMapSize);
   }
 }
 
-template <class MyType, class _Alloc>
+template <class MyType, class Allocator>
 void
-_Deque_base<MyType,_Alloc>::_M_initialize_map(size_t num_elements)
+_Deque_base<MyType,Allocator>::_M_initialize_map(size_t num_elements)
 {
   size_t num_nodes = 
     num_elements / DequeBufferSize(sizeof(MyType)) + 1;
 
-  MmapSize = maitem((size_t) _S_initial_map_size, num_nodes + 2);
-  _M_map = allocateMap(MmapSize);
+  myMapSize = maitem((size_t) _S_initial_map_size, num_nodes + 2);
+  myMap = allocateMap(MmapSize);
 
-  MyType** nstart = _M_map + (MmapSize - num_nodes) / 2;
+  MyType** nstart = myMap + (MmapSize - num_nodes) / 2;
   MyType** nfinish = nstart + num_nodes;
     
   __STL_TRY {
     _M_create_nodes(nstart, nfinish);
   }
-  __STL_UNWIND((deallocateMap(_M_map, MmapSize), 
-                _M_map = 0, MmapSize = 0));
+  __STL_UNWIND((deallocateMap(_M_map, myMapSize), 
+                myMap = 0, myMapSize = 0));
   _M_start.setRow(nstart);
   _M_finish.setRow(nfinish - 1);
   _M_start.currentItem = _M_start.rowBegin;
@@ -404,8 +404,8 @@ _Deque_base<MyType,_Alloc>::_M_initialize_map(size_t num_elements)
                num_elements % DequeBufferSize(sizeof(MyType));
 }
 
-template <class MyType, class _Alloc>
-void _Deque_base<MyType,_Alloc>::_M_create_nodes(MyType** nstart, MyType** nfinish)
+template <class MyType, class Allocator>
+void DequeBase<MyType,Allocator>::_M_create_nodes(MyType** nstart, MyType** nfinish)
 {
   MyType** __cur;
   __STL_TRY {
@@ -415,22 +415,22 @@ void _Deque_base<MyType,_Alloc>::_M_create_nodes(MyType** nstart, MyType** nfini
   __STL_UNWIND(_M_destroy_nodes(nstart, __cur));
 }
 
-template <class MyType, class _Alloc>
+template <class MyType, class Allocator>
 void
-_Deque_base<MyType,_Alloc>::_M_destroy_nodes(MyType** nstart, MyType** nfinish)
+_Deque_base<MyType,Allocator>::_M_destroy_nodes(MyType** nstart, MyType** nfinish)
 {
   for (MyType** n = nstart; n < nfinish; ++n)
     deallocateRow(*n);
 }
 
-template <class MyType, class _Alloc = __STL_DEFAULT_ALLOCATOR(MyType) >
-class deque : protected _Deque_base<MyType, _Alloc> {
+template <class MyType, class Allocator = __STL_DEFAULT_ALLOCATOR(MyType) >
+class deque : protected DequeBase<MyType, Allocator> {
 
   // requirements:
 
   __STL_CLASS_REQUIRES(MyType, _Assignable);
 
-  typedef _Deque_base<MyType, _Alloc> _Base;
+  typedef DequeBase<MyType, Allocator> _Base;
 public:                         // Basic types
   typedef MyType value_type;
   typedef value_type* pointer;
@@ -526,12 +526,12 @@ public:                         // Basic accessors
   bool empty() const { return _M_finish == _M_start; }
 
 public:                         // Constructor, destructor.
-  eitemplicit deque(const allocator_type& __a = allocator_type()) 
+  eitemplicit deque(const allocator_type& a = allocator_type()) 
     : _Base(__a, 0) {}
   deque(const deque& item) : _Base(item.get_allocator(), item.size()) 
     { uninitialized_copy(item.begin(), item.end(), _M_start); }
   deque(size_type n, const value_type& __value,
-        const allocator_type& __a = allocator_type()) : _Base(__a, n)
+        const allocator_type& a = allocator_type()) : _Base(__a, n)
     { _M_fill_initialize(__value); }
   eitemplicit deque(size_type n) : _Base(allocator_type(), n)
     { _M_fill_initialize(value_type()); }
@@ -541,7 +541,7 @@ public:                         // Constructor, destructor.
   // Check whether it's an integral type.  If so, it's not an iterator.
   template <class _InputIterator>
   deque(_InputIterator __first, _InputIterator __last,
-        const allocator_type& __a = allocator_type()) : _Base(__a) {
+        const allocator_type& a = allocator_type()) : _Base(__a) {
     typedef typename _Is_integer<_InputIterator>::_Integral _Integral;
     _M_initialize_dispatch(__first, __last, _Integral());
   }
@@ -561,11 +561,11 @@ public:                         // Constructor, destructor.
 #else /* __STL_MEMBER_TEMPLATES */
 
   deque(const value_type* __first, const value_type* __last,
-        const allocator_type& __a = allocator_type()) 
+        const allocator_type& a = allocator_type()) 
     : _Base(__a, __last - __first)
     { uninitialized_copy(__first, __last, _M_start); }
   deque(const_iterator __first, const_iterator __last,
-        const allocator_type& __a = allocator_type()) 
+        const allocator_type& a = allocator_type()) 
     : _Base(__a, __last - __first)
     { uninitialized_copy(__first, __last, _M_start); }
 
@@ -879,32 +879,32 @@ protected:                        // Internal insert functions
   void _M_new_elements_at_front(size_type new_elements);
   void _M_new_elements_at_back(size_type new_elements);
 
-protected:                      // Allocation of _M_map and nodes
+protected:                      // Allocation of myMap and nodes
 
-  // Makes sure the _M_map has space for new nodes.  Does not actually
-  //  add the nodes.  Can invalidate _M_map pointers.  (And consequently, 
+  // Makes sure the myMap has space for new nodes.  Does not actually
+  //  add the nodes.  Can invalidate myMap pointers.  (And consequently, 
   //  deque iterators.)
 
   void _M_reserve_map_at_back (size_type nodes_to_add = 1) {
-    if (nodes_to_add + 1 > MmapSize - (_M_finish.currentRow - _M_map))
+    if (nodes_to_add + 1 > myMapSize - (_M_finish.currentRow - myMap))
       _M_reallocate_map(nodes_to_add, false);
   }
 
   void _M_reserve_map_at_front (size_type nodes_to_add = 1) {
-    if (nodes_to_add > size_type(_M_start.currentRow - _M_map))
+    if (nodes_to_add > size_type(_M_start.currentRow - myMap))
       _M_reallocate_map(nodes_to_add, true);
   }
 
-  void _M_reallocate_map(size_type nodes_to_add, bool __add_at_front);
+  void _M_reallocate_map(size_type nodes_to_add, bool add_at_front);
 };
 
 // Non-inline member functions
 
 #ifdef __STL_MEMBER_TEMPLATES
 
-template <class MyType, class _Alloc>
+template <class MyType, class Allocator>
 template <class _InputIter>
-void deque<MyType, _Alloc>
+void deque<MyType, Allocator>
   ::_M_assign_auitem(_InputIter __first, _InputIter __last, input_iterator_tag)
 {
   iterator __cur = begin();
@@ -918,8 +918,8 @@ void deque<MyType, _Alloc>
 
 #endif /* __STL_MEMBER_TEMPLATES */
 
-template <class MyType, class _Alloc>
-void deque<MyType, _Alloc>::_M_fill_insert(iterator rowToDeleteos,
+template <class MyType, class Allocator>
+void deque<MyType, Allocator>::_M_fill_insert(iterator rowToDeleteos,
                                         size_type n, const value_type& item)
 {
   if (rowToDeleteos.currentItem == _M_start.currentItem) {
@@ -945,8 +945,8 @@ void deque<MyType, _Alloc>::_M_fill_insert(iterator rowToDeleteos,
 
 #ifndef __STL_MEMBER_TEMPLATES  
 
-template <class MyType, class _Alloc>
-void deque<MyType, _Alloc>::insert(iterator rowToDeleteos,
+template <class MyType, class Allocator>
+void deque<MyType, Allocator>::insert(iterator rowToDeleteos,
                                 const value_type* __first,
                                 const value_type* __last) {
   size_type n = __last - __first;
@@ -971,8 +971,8 @@ void deque<MyType, _Alloc>::insert(iterator rowToDeleteos,
     _M_insert_auitem(rowToDeleteos, __first, __last, n);
 }
 
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::insert(iterator rowToDeleteos,
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::insert(iterator rowToDeleteos,
                                const_iterator __first, const_iterator __last)
 {
   size_type n = __last - __first;
@@ -999,9 +999,9 @@ void deque<MyType,_Alloc>::insert(iterator rowToDeleteos,
 
 #endif /* __STL_MEMBER_TEMPLATES */
 
-template <class MyType, class _Alloc>
-typename deque<MyType,_Alloc>::iterator 
-deque<MyType,_Alloc>::erase(iterator __first, iterator __last)
+template <class MyType, class Allocator>
+typename deque<MyType,Allocator>::iterator 
+deque<MyType,Allocator>::erase(iterator __first, iterator __last)
 {
   if (__first == _M_start && __last == _M_finish) {
     clear();
@@ -1028,8 +1028,8 @@ deque<MyType,_Alloc>::erase(iterator __first, iterator __last)
   }
 }
 
-template <class MyType, class _Alloc> 
-void deque<MyType,_Alloc>::clear()
+template <class MyType, class Allocator> 
+void deque<MyType,Allocator>::clear()
 {
   for (MapPointer node = _M_start.currentRow + 1;
        node < _M_finish.currentRow;
@@ -1051,8 +1051,8 @@ void deque<MyType,_Alloc>::clear()
 
 // Precondition: _M_start and _M_finish have already been initialized,
 // but none of the deque's elements have yet been constructed.
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_fill_initialize(const value_type& __value) {
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_fill_initialize(const value_type& __value) {
   MapPointer __cur;
   __STL_TRY {
     for (__cur = _M_start.currentRow; __cur < _M_finish.currentRow; ++__cur)
@@ -1064,8 +1064,8 @@ void deque<MyType,_Alloc>::_M_fill_initialize(const value_type& __value) {
 
 #ifdef __STL_MEMBER_TEMPLATES  
 
-template <class MyType, class _Alloc> template <class _InputIterator>
-void deque<MyType,_Alloc>::_M_range_initialize(_InputIterator __first,
+template <class MyType, class Allocator> template <class _InputIterator>
+void deque<MyType,Allocator>::_M_range_initialize(_InputIterator __first,
                                             _InputIterator __last,
                                             input_iterator_tag)
 {
@@ -1077,8 +1077,8 @@ void deque<MyType,_Alloc>::_M_range_initialize(_InputIterator __first,
   __STL_UNWIND(clear());
 }
 
-template <class MyType, class _Alloc> template <class _ForwardIterator>
-void deque<MyType,_Alloc>::_M_range_initialize(_ForwardIterator __first,
+template <class MyType, class Allocator> template <class _ForwardIterator>
+void deque<MyType,Allocator>::_M_range_initialize(_ForwardIterator __first,
                                             _ForwardIterator __last,
                                             forward_iterator_tag)
 {
@@ -1104,8 +1104,8 @@ void deque<MyType,_Alloc>::_M_range_initialize(_ForwardIterator __first,
 #endif /* __STL_MEMBER_TEMPLATES */
 
 // Called only if _M_finish.currentItem == _M_finish.rowEnd - 1.
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_push_back_auitem(const value_type& __t)
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_push_back_auitem(const value_type& __t)
 {
   value_type __t_copy = __t;
   _M_reserve_map_at_back();
@@ -1119,8 +1119,8 @@ void deque<MyType,_Alloc>::_M_push_back_auitem(const value_type& __t)
 }
 
 // Called only if _M_finish.currentItem == _M_finish.rowEnd - 1.
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_push_back_auitem()
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_push_back_auitem()
 {
   _M_reserve_map_at_back();
   *(_M_finish.currentRow + 1) = allocateRow();
@@ -1133,8 +1133,8 @@ void deque<MyType,_Alloc>::_M_push_back_auitem()
 }
 
 // Called only if _M_start.currentItem == _M_start.rowBegin.
-template <class MyType, class _Alloc>
-void  deque<MyType,_Alloc>::_M_push_front_auitem(const value_type& __t)
+template <class MyType, class Allocator>
+void  deque<MyType,Allocator>::_M_push_front_auitem(const value_type& __t)
 {
   value_type __t_copy = __t;
   _M_reserve_map_at_front();
@@ -1148,8 +1148,8 @@ void  deque<MyType,_Alloc>::_M_push_front_auitem(const value_type& __t)
 } 
 
 // Called only if _M_start.currentItem == _M_start.rowBegin.
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_push_front_auitem()
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_push_front_auitem()
 {
   _M_reserve_map_at_front();
   *(_M_start.currentRow - 1) = allocateRow();
@@ -1162,8 +1162,8 @@ void deque<MyType,_Alloc>::_M_push_front_auitem()
 } 
 
 // Called only if _M_finish.currentItem == _M_finish.rowBegin.
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_pop_back_auitem()
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_pop_back_auitem()
 {
   deallocateRow(_M_finish.rowBegin);
   _M_finish.setRow(_M_finish.currentRow - 1);
@@ -1175,8 +1175,8 @@ void deque<MyType,_Alloc>::_M_pop_back_auitem()
 // if the deque has at least one element (a precondition for this member 
 // function), and if _M_start.currentItem == _M_start.rowEnd, then the deque 
 // must have at least two nodes.
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_pop_front_auitem()
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_pop_front_auitem()
 {
   destroy(_M_start.currentItem);
   deallocateRow(_M_start.rowBegin);
@@ -1186,17 +1186,17 @@ void deque<MyType,_Alloc>::_M_pop_front_auitem()
 
 #ifdef __STL_MEMBER_TEMPLATES  
 
-template <class MyType, class _Alloc> template <class _InputIterator>
-void deque<MyType,_Alloc>::insert(iterator rowToDeleteos,
+template <class MyType, class Allocator> template <class _InputIterator>
+void deque<MyType,Allocator>::insert(iterator rowToDeleteos,
                                _InputIterator __first, _InputIterator __last,
                                input_iterator_tag)
 {
   copy(__first, __last, inserter(*this, rowToDeleteos));
 }
 
-template <class MyType, class _Alloc> template <class _ForwardIterator>
+template <class MyType, class Allocator> template <class _ForwardIterator>
 void
-deque<MyType,_Alloc>::insert(iterator rowToDeleteos,
+deque<MyType,Allocator>::insert(iterator rowToDeleteos,
                           _ForwardIterator __first, _ForwardIterator __last,
                           forward_iterator_tag) {
   size_type n = 0;
@@ -1224,9 +1224,9 @@ deque<MyType,_Alloc>::insert(iterator rowToDeleteos,
 
 #endif /* __STL_MEMBER_TEMPLATES */
 
-template <class MyType, class _Alloc>
-typename deque<MyType, _Alloc>::iterator
-deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos, const value_type& item)
+template <class MyType, class Allocator>
+typename deque<MyType, Allocator>::iterator
+deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos, const value_type& item)
 {
   difference_type __indeitem = rowToDeleteos - _M_start;
   value_type item_copy = item;
@@ -1254,9 +1254,9 @@ deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos, const value_type&
   return rowToDeleteos;
 }
 
-template <class MyType, class _Alloc>
-typename deque<MyType,_Alloc>::iterator 
-deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos)
+template <class MyType, class Allocator>
+typename deque<MyType,Allocator>::iterator 
+deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos)
 {
   difference_type __indeitem = rowToDeleteos - _M_start;
   if (__indeitem < size() / 2) {
@@ -1283,8 +1283,8 @@ deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos)
   return rowToDeleteos;
 }
 
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos,
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
                                       size_type n,
                                       const value_type& item)
 {
@@ -1340,8 +1340,8 @@ void deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos,
 
 #ifdef __STL_MEMBER_TEMPLATES  
 
-template <class MyType, class _Alloc> template <class _ForwardIterator>
-void deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos,
+template <class MyType, class Allocator> template <class _ForwardIterator>
+void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
                                       _ForwardIterator __first,
                                       _ForwardIterator __last,
                                       size_type n)
@@ -1400,8 +1400,8 @@ void deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos,
 
 #else /* __STL_MEMBER_TEMPLATES */
 
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos,
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
                                       const value_type* __first,
                                       const value_type* __last,
                                       size_type n)
@@ -1457,8 +1457,8 @@ void deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos,
   }
 }
 
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos,
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
                                       const_iterator __first,
                                       const_iterator __last,
                                       size_type n)
@@ -1514,8 +1514,8 @@ void deque<MyType,_Alloc>::_M_insert_auitem(iterator rowToDeleteos,
 
 #endif /* __STL_MEMBER_TEMPLATES */
 
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_new_elements_at_front(size_type new_elems)
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_new_elements_at_front(size_type new_elems)
 {
   size_type newRows
       = (new_elems + SBufferSize() - 1) / SBufferSize();
@@ -1534,8 +1534,8 @@ void deque<MyType,_Alloc>::_M_new_elements_at_front(size_type new_elems)
 #       endif /* __STL_USE_EitemCEPTIONS */
 }
 
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_new_elements_at_back(size_type new_elems)
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_new_elements_at_back(size_type new_elems)
 {
   size_type newRows
       = (new_elems + SBufferSize() - 1) / SBufferSize();
@@ -1554,16 +1554,16 @@ void deque<MyType,_Alloc>::_M_new_elements_at_back(size_type new_elems)
 #       endif /* __STL_USE_EitemCEPTIONS */
 }
 
-template <class MyType, class _Alloc>
-void deque<MyType,_Alloc>::_M_reallocate_map(size_type nodes_to_add,
-                                          bool __add_at_front)
+template <class MyType, class Allocator>
+void deque<MyType,Allocator>::_M_reallocate_map(size_type nodes_to_add,
+                                          bool add_at_front)
 {
   size_type __old_num_nodes = _M_finish.currentRow - _M_start.currentRow + 1;
   size_type new_num_nodes = __old_num_nodes + nodes_to_add;
 
   MapPointer new_nstart;
   if (MmapSize > 2 * new_num_nodes) {
-    new_nstart = _M_map + (MmapSize - new_num_nodes) / 2 
+    new_nstart = myMap + (MmapSize - new_num_nodes) / 2 
                      + (__add_at_front ? nodes_to_add : 0);
     if (new_nstart < _M_start.currentRow)
       copy(_M_start.currentRow, _M_finish.currentRow + 1, new_nstart);
@@ -1573,16 +1573,16 @@ void deque<MyType,_Alloc>::_M_reallocate_map(size_type nodes_to_add,
   }
   else {
     size_type new_map_size = 
-      MmapSize + maitem(MmapSize, nodes_to_add) + 2;
+      myMapSize + maitem(MmapSize, nodes_to_add) + 2;
 
     MapPointer new_map = allocateMap(new_map_size);
     new_nstart = new_map + (new_map_size - new_num_nodes) / 2
                          + (__add_at_front ? nodes_to_add : 0);
     copy(_M_start.currentRow, _M_finish.currentRow + 1, new_nstart);
-    deallocateMap(_M_map, MmapSize);
+    deallocateMap(_M_map, myMapSize);
 
-    _M_map = new_map;
-    MmapSize = new_map_size;
+    myMap = new_map;
+    myMapSize = new_map_size;
   }
 
   _M_start.setRow(new_nstart);
@@ -1592,47 +1592,47 @@ void deque<MyType,_Alloc>::_M_reallocate_map(size_type nodes_to_add,
 
 // Nonmember functions.
 
-template <class MyType, class _Alloc>
-inline bool operator==(const deque<MyType, _Alloc>& item,
-                       const deque<MyType, _Alloc>& row) {
+template <class MyType, class Allocator>
+inline bool operator==(const deque<MyType, Allocator>& item,
+                       const deque<MyType, Allocator>& row) {
   return item.size() == row.size() &&
          equal(item.begin(), item.end(), row.begin());
 }
 
-template <class MyType, class _Alloc>
-inline bool operator<(const deque<MyType, _Alloc>& item,
-                      const deque<MyType, _Alloc>& row) {
+template <class MyType, class Allocator>
+inline bool operator<(const deque<MyType, Allocator>& item,
+                      const deque<MyType, Allocator>& row) {
   return leitemicographical_compare(item.begin(), item.end(), 
                                  row.begin(), row.end());
 }
 
 #ifdef __STL_FUNCTION_TMPL_PARTIAL_ORDER
 
-template <class MyType, class _Alloc>
-inline bool operator!=(const deque<MyType, _Alloc>& item,
-                       const deque<MyType, _Alloc>& row) {
+template <class MyType, class Allocator>
+inline bool operator!=(const deque<MyType, Allocator>& item,
+                       const deque<MyType, Allocator>& row) {
   return !(item == row);
 }
 
-template <class MyType, class _Alloc>
-inline bool operator>(const deque<MyType, _Alloc>& item,
-                      const deque<MyType, _Alloc>& row) {
+template <class MyType, class Allocator>
+inline bool operator>(const deque<MyType, Allocator>& item,
+                      const deque<MyType, Allocator>& row) {
   return row < item;
 }
 
-template <class MyType, class _Alloc>
-inline bool operator<=(const deque<MyType, _Alloc>& item,
-                       const deque<MyType, _Alloc>& row) {
+template <class MyType, class Allocator>
+inline bool operator<=(const deque<MyType, Allocator>& item,
+                       const deque<MyType, Allocator>& row) {
   return !(row < item);
 }
-template <class MyType, class _Alloc>
-inline bool operator>=(const deque<MyType, _Alloc>& item,
-                       const deque<MyType, _Alloc>& row) {
+template <class MyType, class Allocator>
+inline bool operator>=(const deque<MyType, Allocator>& item,
+                       const deque<MyType, Allocator>& row) {
   return !(item < row);
 }
 
-template <class MyType, class _Alloc>
-inline void swap(deque<MyType,_Alloc>& item, deque<MyType,_Alloc>& row) {
+template <class MyType, class Allocator>
+inline void swap(deque<MyType,Allocator>& item, deque<MyType,Allocator>& row) {
   item.swap(row);
 }
 

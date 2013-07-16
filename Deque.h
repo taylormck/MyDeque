@@ -101,15 +101,15 @@ class MyDeque {
 
 	private:
 		const static int LOG_INNER_SIZE = 5;
-		const static size_type INNER_SIZE = 1 << LOG_INNER_SIZE;
+		const static size_type INNER_ARRAY_SIZE = 1 << LOG_INNER_SIZE;
 
-		size_type _size;
-		pointer_size_type _outer_array_size;
+		size_type mySize;
+		pointer_size_type myOuterArraySize;
 		
-		allocator_type _allocator;
-		pointer_allocator_type _pointer_allocator;
+		allocator_type myAllocator;
+		pointer_allocator_type myPointerAllocator;
 		
-		pointer _array;
+		pointer _array ;
 
 	private:
 
@@ -629,7 +629,7 @@ class MyDeque {
 		 */
 		void resize(size_type s, const_reference v = value_type()) {
 			// <your code>
-			_size = s;
+			mySize = s;
 			assert(valid());
 		}
 

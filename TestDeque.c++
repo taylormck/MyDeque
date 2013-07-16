@@ -621,7 +621,7 @@ class IteratorTest : public testing::Test {
 		value_type m, n;
 		const difference_type s;
 
-		IteratorTest() : s(0) {}
+		IteratorTest() : s(10000) {}
 
 		void SetUpBegin() {
 			x.push_back(0);

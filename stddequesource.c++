@@ -227,8 +227,6 @@ operator+(ptrdiff_t n, const DequeIterator<MyType, Reference, Pointer>& item)
 //  the differences between SGI-style allocators and standard-conforming
 //  allocators.
 
-#ifdef __STL_USE_STD_ALLOCATORS
-
 // Base class for ordinary allocators.
 template <class MyType, class Allocator, bool isStatic>
 class DequeAllocatorBase {
@@ -237,7 +235,7 @@ public:
   allocator_type get_allocator() const { return myAllocator; }
 
   DequeAllocatorBase(const allocator_type& a)
-    : myAllocator(__a), MmapAllocator(__a),
+    : myAllocator(a), MmapAllocator(a),
       myMap(0), myMapSize(0)
   {}
   
@@ -306,11 +304,11 @@ public:
   typedef DequeIterator<MyType,const MyType&,const MyType*> const_iterator;
 
   DequeBase(const allocator_type& a, size_t num_elements)
-    : _Base(__a), _M_start(), _M_finish()
+    : _Base(a), _M_start(), _M_finish()
     { _M_initialize_map(num_elements); }
   DequeBase(const allocator_type& a) 
-    : _Base(__a), _M_start(), _M_finish() {}
-  ~_Deque_base();    
+    : _Base(a), _M_start(), _M_finish() {}
+  ~DequeBase();    
 
 protected:
   void _M_initialize_map(size_t);
@@ -322,57 +320,11 @@ protected:
   iterator _M_start;
   iterator _M_finish;
 };
-
-#else /* __STL_USE_STD_ALLOCATORS */
-
-template <class MyType, class Allocator>
-class DequeBase {
-public:
-  typedef DequeIterator<MyType,MyType&,MyType*>             iterator;
-  typedef DequeIterator<MyType,const MyType&,const MyType*> const_iterator;
-
-  typedef Allocator allocator_type;
-  allocator_type get_allocator() const { return allocator_type(); }
-
-  DequeBase(const allocator_type&, size_t num_elements)
-    : myMap(0), myMapSize(0),  _M_start(), _M_finish() {
-    _M_initialize_map(num_elements);
-  }
-  DequeBase(const allocator_type&)
-    : myMap(0), myMapSize(0),  _M_start(), _M_finish() {}
-  ~_Deque_base();    
-
-protected:
-  void _M_initialize_map(size_t);
-  void _M_create_nodes(MyType** nstart, MyType** nfinish);
-  void _M_destroy_nodes(MyType** nstart, MyType** nfinish);
-  enum { _S_initial_map_size = 8 };
-
-protected:
-  MyType** myMap;
-  size_t myMapSize;  
-  iterator _M_start;
-  iterator _M_finish;
-
-  typedef simple_alloc<MyType, Allocator>  NodeAllocatorType;
-  typedef simple_alloc<MyType*, Allocator> MapAllocatorType;
-
-  MyType* allocateRow()
-    { return NodeAllocatorType::allocate(DequeBufferSize(sizeof(MyType))); }
-  void deallocateRow(MyType* rowToDelete)
-    { NodeAllocatorType::deallocate(rowToDelete, DequeBufferSize(sizeof(MyType))); }
-  MyType** allocateMap(size_t n) 
-    { return MapAllocatorType::allocate(n); }
-  void deallocateMap(MyType** rowToDelete, size_t n) 
-    { MapAllocatorType::deallocate(rowToDelete, n); }
-};
-
-#endif /* __STL_USE_STD_ALLOCATORS */
 
 // Non-inline member functions from DequeBase.
 
 template <class MyType, class Allocator>
-_Deque_base<MyType,Allocator>::~_Deque_base() {
+_Deque_base<MyType,Allocator>::~DequeBase() {
   if (_M_map) {
     _M_destroy_nodes(_M_start.currentRow, _M_finish.currentRow + 1);
     deallocateMap(_M_map, myMapSize);
@@ -527,11 +479,11 @@ public:                         // Basic accessors
 
 public:                         // Constructor, destructor.
   eitemplicit deque(const allocator_type& a = allocator_type()) 
-    : _Base(__a, 0) {}
+    : _Base(a, 0) {}
   deque(const deque& item) : _Base(item.get_allocator(), item.size()) 
     { uninitialized_copy(item.begin(), item.end(), _M_start); }
   deque(size_type n, const value_type& __value,
-        const allocator_type& a = allocator_type()) : _Base(__a, n)
+        const allocator_type& a = allocator_type()) : _Base(a, n)
     { _M_fill_initialize(__value); }
   eitemplicit deque(size_type n) : _Base(allocator_type(), n)
     { _M_fill_initialize(value_type()); }
@@ -541,7 +493,7 @@ public:                         // Constructor, destructor.
   // Check whether it's an integral type.  If so, it's not an iterator.
   template <class _InputIterator>
   deque(_InputIterator __first, _InputIterator __last,
-        const allocator_type& a = allocator_type()) : _Base(__a) {
+        const allocator_type& a = allocator_type()) : _Base(a) {
     typedef typename _Is_integer<_InputIterator>::_Integral _Integral;
     _M_initialize_dispatch(__first, __last, _Integral());
   }
@@ -562,11 +514,11 @@ public:                         // Constructor, destructor.
 
   deque(const value_type* __first, const value_type* __last,
         const allocator_type& a = allocator_type()) 
-    : _Base(__a, __last - __first)
+    : _Base(a, __last - __first)
     { uninitialized_copy(__first, __last, _M_start); }
   deque(const_iterator __first, const_iterator __last,
         const allocator_type& a = allocator_type()) 
-    : _Base(__a, __last - __first)
+    : _Base(a, __last - __first)
     { uninitialized_copy(__first, __last, _M_start); }
 
 #endif /* __STL_MEMBER_TEMPLATES */
@@ -1564,7 +1516,7 @@ void deque<MyType,Allocator>::_M_reallocate_map(size_type nodes_to_add,
   MapPointer new_nstart;
   if (MmapSize > 2 * new_num_nodes) {
     new_nstart = myMap + (MmapSize - new_num_nodes) / 2 
-                     + (__add_at_front ? nodes_to_add : 0);
+                     + (add_at_front ? nodes_to_add : 0);
     if (new_nstart < _M_start.currentRow)
       copy(_M_start.currentRow, _M_finish.currentRow + 1, new_nstart);
     else
@@ -1577,7 +1529,7 @@ void deque<MyType,Allocator>::_M_reallocate_map(size_type nodes_to_add,
 
     MapPointer new_map = allocateMap(new_map_size);
     new_nstart = new_map + (new_map_size - new_num_nodes) / 2
-                         + (__add_at_front ? nodes_to_add : 0);
+                         + (add_at_front ? nodes_to_add : 0);
     copy(_M_start.currentRow, _M_finish.currentRow + 1, new_nstart);
     deallocateMap(_M_map, myMapSize);
 

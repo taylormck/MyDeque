@@ -77,8 +77,6 @@ class MyDeque {
 		typedef typename allocator_type::const_reference const_reference;
 
 		typedef typename allocator_type::template rebind<pointer>::other pointer_allocator_type;
-		typedef typename pointer_allocator_type::size_type pointer_size_type;
-		typedef typename pointer_allocator_type::difference_type pointer_difference_type;
 
 	public:
 		/**
@@ -104,12 +102,12 @@ class MyDeque {
 		const static size_type INNER_ARRAY_SIZE = 1 << LOG_INNER_SIZE;
 
 		size_type mySize;
-		pointer_size_type myOuterArraySize;
+		size_type myOuterArraySize;
 		
 		allocator_type myAllocator;
 		pointer_allocator_type myPointerAllocator;
 		
-		pointer _array ;
+		pointer myArray ;
 
 	private:
 

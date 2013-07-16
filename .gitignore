@@ -19,3 +19,6 @@ TestDeque
 .project
 .settings
 .cproject
+
+# Sublime files
+.nfs*

@@ -967,26 +967,106 @@ TYPED_TEST(IteratorTest, Insert) {
 
 class MyDequeTest : public testing::Test {
 	protected:
-		typedef typename MyDeque<int>::value_type value_type;
-		typedef typename MyDeque<int>::iterator iterator;
-		typedef typename MyDeque<int>::const_iterator const_iterator;
-		typedef typename MyDeque<int>::difference_type difference_type;
-		typedef typename MyDeque<int>::allocator_type allocator_type;
-		MyDeque<int> x;
+		typedef MyDeque<int> container;
+		typedef container::value_type value_type;
+		typedef container::iterator iterator;
+		typedef container::const_iterator const_iterator;
+		typedef container::size_type size_type;
+		typedef container::difference_type difference_type;
+		typedef container::allocator_type allocator_type;
+		typedef value_type::pointer pointer;
+		typedef pointer* map_pointer;
+		container x;
 		iterator i;
 		value_type v;
 		allocator_type a;
-		const difference_type s;
+		const size_type small, large;
 
-		MyDequeTest() : v(5), s(10000) {}
+		MyDequeTest() : v(5), small(10), large(10000) {}
 };
 
 // --- default constructor ---
 
 TEST_F(MyDequeTest, DefaultConstructor) {
-	ASSERT_EQ(0, x.size());
+	EXPECT_EQ(0, x.size());
+	EXPECT_EQ(a, x.myAllocator);
+}
 
-	ASSERT_EQ(a, this->x.myAllocator);
+// --- single allocator constructor ---
+
+TEST_F(MyDequeTest, SingleAllocatrConstructor) {
+	container y (a);
+	EXPECT_EQ(0, y.size());
+	EXPECT_EQ(a, y.myAllocator);
+}
+
+// --- size / value constructor ---
+
+TEST_F(MyDequeTest, SizeValueConstructorEmpty) {
+	container y (0, v);
+	EXPECT_EQ(0, y.size());
+	EXPECT_EQ(a, y.myAllocator);
+	// TODO stuff for empty MyDeque
+}
+
+TEST_F(MyDequeTest, SizeValueConstructorSmall) {
+	container y (small, v);
+	EXPECT_EQ(small, y.size());
+	EXPECT_EQ(a, y.myAllocator);
+	// TODO stuff for empty MyDeque
+}
+
+TEST_F(MyDequeTest, SizeValueConstructorSmallWithAllocator) {
+	container y (small, v, a);
+	EXPECT_EQ(small, y.size());
+	EXPECT_EQ(a, y.myAllocator);
+	// TODO stuff for empty MyDeque
+}
+
+TEST_F(MyDequeTest, SizeValueConstructorLarge) {
+	container y (large, v);
+	EXPECT_EQ(large, y.size());
+	EXPECT_EQ(a, y.myAllocator);
+	// TODO stuff for empty MyDeque
+}
+
+TEST_F(MyDequeTest, SizeValueConstructorLargeWithAllocator) {
+	container y (large, v, a);
+	EXPECT_EQ(large, y.size());
+	EXPECT_EQ(a, y.myAllocator);
+	// TODO stuff for empty MyDeque
+}
+
+// --- copy constructor ---
+
+TEST_F(MyDequeTest, CopyConstructorEmpty) {
+	container z (x);
+	EXPECT_EQ(0, z.size());
+	EXPECT_EQ(a, z.myAllocator);
+
+	// TODO stuff for empty MyDeque
+}
+
+TEST_F(MyDequeTest, CopyConstructorSmall) {
+	container y (small, v);
+	EXPECT_EQ(small, y.size());
+	EXPECT_EQ(a, y.myAllocator);
+
+	container z (y);
+	EXPECT_EQ(small, z.size());
+	EXPECT_EQ(a, z.myAllocator);
+	// TODO stuff for empty MyDeque
+}
+
+TEST_F(MyDequeTest, CopyConstructorLarge) {
+	container y (large, v);
+	EXPECT_EQ(large, y.size());
+	EXPECT_EQ(a, y.myAllocator);
+
+	container z (y);
+	EXPECT_EQ(large, z.size());
+	EXPECT_EQ(a, z.myAllocator);
+	// TODO stuff for empty MyDeque
 }
 
 // --- valid ---
@@ -996,4 +1076,16 @@ TEST_F(MyDequeTest, DefaultConstructor) {
 // TODO
 
 // --- const_iterator::valid ---
+// TODO
+
+// --- allocateRow ---
+// TODO
+
+// --- deallocateRow ---
+// TODO
+
+// --- allocateMap ---
+// TODO
+
+// --- deallocateMap ---
 // TODO

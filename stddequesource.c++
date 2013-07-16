@@ -254,8 +254,8 @@ protected:
   }
   MyType** allocateMap(size_t n) 
     { return MmapAllocator.allocate(n); }
-  void deallocateMap(MyType** rowToDelete, size_t n) 
-    { MmapAllocator.deallocate(rowToDelete, n); }
+  void deallocateMap(MyType** mapToDelete, size_t n) 
+    { MmapAllocator.deallocate(mapToDelete, n); }
 
   MyType** myMap;
   size_t myMapSize;

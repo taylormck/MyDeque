@@ -76,7 +76,8 @@ class MyDeque {
 		typedef typename allocator_type::reference reference;
 		typedef typename allocator_type::const_reference const_reference;
 
-		typedef typename allocator_type::template rebind<pointer>::other mapmyAllocator_type;
+		typedef typename allocator_type::template rebind<pointer>::other map_allocator_type;
+        typedef typename map_allocator_type::pointer map_pointer;
 
 	public:
 		/**
@@ -98,7 +99,7 @@ class MyDeque {
 		}
 
 	private:
-		const static int LOG_INNERmySize = 5;
+		const static int LOG_INNERmySize = 7;
 		const static size_type INNER_ARRAYmySize = 1 << LOG_INNERmySize;
 
 		size_type mySize;
@@ -107,7 +108,7 @@ class MyDeque {
 		allocator_type myAllocator;
 		mapmyAllocator_type myMapAllocator;
 		
-		pointer myMap ;
+		map_pointer myMap ;
 
 	private:
 
@@ -115,6 +116,34 @@ class MyDeque {
 			// TODO <your code>
 			return true;
 		}
+
+        /**
+         * TODO <your documentation>
+         */
+        pointer allocateRow() {
+            // TODO <your code>
+        }
+
+        /**
+         * TODO <your documentation>
+         */
+        void deallocateRow(pointer rowToDelete) {
+            // TODO <your code>
+        }
+
+        /**
+         * TODO <your documentation>
+         */
+        map_pointer allocateMap(size_type n) {
+            // TODO <your code>
+        }
+
+        /**
+         * TODO <your documentation>
+         */
+        void deallocateMap(map_pointer mapToDelete, size_type n) {
+            // TODO <your code>
+        }
 
 	public:
 
@@ -645,20 +674,6 @@ class MyDeque {
 			// TODO <your code>
 			assert(valid());
 		}
-
-        /**
-         * TODO <your documentation>
-         */
-        void allocateRow() {
-            // TODO <your code>
-        }
-
-        /**
-         * TODO <your documentation>
-         */
-        void allocateMap(size_type n) {
-            // TODO <your code>
-        }
 };
 
 #endif // Deque_h

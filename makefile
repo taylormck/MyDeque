@@ -5,6 +5,7 @@ clean:
 	rm -f Deque.log
 	rm -f Deque.zip
 	rm -f TestDeque
+	rm -f .nfs*
 
 doc: Deque.h
 	doxygen Doxyfile

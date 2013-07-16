@@ -965,34 +965,28 @@ TYPED_TEST(IteratorTest, Insert) {
 // These are tests tailored to MyDeque
 // Here, I can test implementation-dependent details of MyDeque
 
-template<typename T>
 class MyDequeTest : public testing::Test {
 	protected:
-		typedef typename MyDeque<T>::value_type value_type;
-		typedef typename MyDeque<T>::iterator iterator;
-		typedef typename MyDeque<T>::const_iterator const_iterator;
-		typedef typename MyDeque<T>::difference_type difference_type;
-		typedef typename MyDeque<T>::allocator_type allocator_type;
-		MyDeque<T> x, y;
-		iterator i, j;
+		typedef typename MyDeque<int>::value_type value_type;
+		typedef typename MyDeque<int>::iterator iterator;
+		typedef typename MyDeque<int>::const_iterator const_iterator;
+		typedef typename MyDeque<int>::difference_type difference_type;
+		typedef typename MyDeque<int>::allocator_type allocator_type;
+		MyDeque<int> x;
+		iterator i;
+		value_type v;
+		allocator_type a;
 		const difference_type s;
 
-		MyDequeTest() : s(10000) {}
+		MyDequeTest() : v(5), s(10000) {}
 };
-
-typedef testing::Types<int, char, std::string> MyTypes;
-TYPED_TEST_CASE(MyDequeTest, MyTypes);
 
 // --- default constructor ---
 
-TYPED_TEST(MyDequeTest, DefaultConstructor) {
-	ASSERT_EQ(0, this->x.size());
-	ASSERT_EQ(0, this->y.size());
+TEST_F(MyDequeTest, DefaultConstructor) {
+	ASSERT_EQ(0, x.size());
 
-	typename TestFixture::allocator_type a;
-
-	ASSERT_EQ(a, this->x._allocator);
-	ASSERT_EQ(a, this->y._allocator);
+	ASSERT_EQ(a, this->x.myAllocator);
 }
 
 // --- valid ---

@@ -76,43 +76,43 @@ class MyDeque {
 		typedef typename allocator_type::reference reference;
 		typedef typename allocator_type::const_reference const_reference;
 
-		typedef typename allocator_type::template rebind<pointer>::other pointer_allocator_type;
+		typedef typename allocator_type::template rebind<pointer>::other mapmyAllocator_type;
 
 	public:
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		friend bool operator ==(const MyDeque& lhs, const MyDeque& rhs) {
-			// <your code>
+			// TODO <your code>
 			// you must use std::equal()
 			return true;
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		friend bool operator <(const MyDeque& lhs, const MyDeque& rhs) {
-			// <your code>
+			// TODO <your code>
 			// you must use std::lexicographical_compare()
 			return true;
 		}
 
 	private:
-		const static int LOG_INNER_SIZE = 5;
-		const static size_type INNER_ARRAY_SIZE = 1 << LOG_INNER_SIZE;
+		const static int LOG_INNERmySize = 5;
+		const static size_type INNER_ARRAYmySize = 1 << LOG_INNERmySize;
 
 		size_type mySize;
-		size_type myOuterArraySize;
+		size_type myMapSize;
 		
 		allocator_type myAllocator;
-		pointer_allocator_type myPointerAllocator;
+		mapmyAllocator_type myMapAllocator;
 		
-		pointer myArray ;
+		pointer myMap ;
 
 	private:
 
 		bool valid() const {
-			// <your code>
+			// TODO <your code>
 			return true;
 		}
 
@@ -130,29 +130,29 @@ class MyDeque {
 			public:
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				friend bool operator ==(const iterator& lhs, const iterator& rhs) {
-					// <your code>
+					// TODO <your code>
 					return true;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				friend bool operator !=(const iterator& lhs, const iterator& rhs) {
 					return !(lhs == rhs);
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				friend iterator operator +(iterator lhs, difference_type rhs) {
 					return lhs += rhs;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				friend iterator operator -(iterator lhs, difference_type rhs) {
 					return lhs -= rhs;
@@ -165,48 +165,48 @@ class MyDeque {
 			private:
 
 				bool valid() const {
-					// <your code>
+					// TODO <your code>
 					return true;
 				}
 
 			public:
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				iterator(/* <your arguments> */) {
-					// <your code>
+					// TODO <your code>
 					// assert(valid());
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				reference operator *() const {
-					// <your code>
+					// TODO <your code>
 					// dummy is just to be able to compile the skeleton, remove it
 					static value_type dummy;
 					return dummy;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				pointer operator ->() const {
 					return &**this;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				iterator& operator ++() {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 					return *this;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				iterator operator ++(int) {
 					iterator x = *this;
@@ -216,16 +216,16 @@ class MyDeque {
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				iterator& operator --() {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 					return *this;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				iterator operator --(int) {
 					iterator x = *this;
@@ -235,19 +235,19 @@ class MyDeque {
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				iterator& operator +=(difference_type d) {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 					return *this;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				iterator& operator -=(difference_type d) {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 					return *this;
 				}
@@ -264,29 +264,29 @@ class MyDeque {
 
 			public:
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				friend bool operator ==(const const_iterator& lhs, const const_iterator& rhs) {
-					// <your code>
+					// TODO <your code>
 					return true;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				friend bool operator !=(const const_iterator& lhs, const const_iterator& rhs) {
 					return !(lhs == rhs);
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				friend const_iterator operator +(const_iterator lhs, difference_type rhs) {
 					return lhs += rhs;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				friend const_iterator operator -(const_iterator lhs, difference_type rhs) {
 					return lhs -= rhs;
@@ -297,24 +297,24 @@ class MyDeque {
 
 			private:
 				bool valid() const {
-					// <your code>
+					// TODO <your code>
 					return true;
 				}
 
 			public:
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				const_iterator(/* <your arguments> */) {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 				}
 
                 /**
-                 * <your documentation>
+                 * TODO <your documentation>
                  */
                 const_iterator(iterator) {
-                    // <your code>
+                    // TODO <your code>
                     assert(valid());
                 }
 
@@ -324,33 +324,33 @@ class MyDeque {
 				// const_iterator& operator = (const const_iterator&);
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				reference operator *() const {
-					// <your code>
+					// TODO <your code>
 					// dummy is just to be able to compile the skeleton, remove it
 					static value_type dummy;
 					return dummy;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				pointer operator ->() const {
 					return &**this;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				const_iterator& operator ++() {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 					return *this;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				const_iterator operator ++(int) {
 					const_iterator x = *this;
@@ -360,16 +360,16 @@ class MyDeque {
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				const_iterator& operator --() {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 					return *this;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				const_iterator operator --(int) {
 					const_iterator x = *this;
@@ -379,19 +379,19 @@ class MyDeque {
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				const_iterator& operator +=(difference_type) {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 					return *this;
 				}
 
 				/**
-				 * <your documentation>
+				 * TODO <your documentation>
 				 */
 				const_iterator& operator -=(difference_type) {
-					// <your code>
+					// TODO <your code>
 					assert(valid());
 					return *this;
 				}
@@ -399,252 +399,266 @@ class MyDeque {
 
 	public:
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		explicit MyDeque(const allocator_type& a = allocator_type()) :
-				_size(0),
-				_outer_array_size(3),
-				_allocator(a),
-				_pointer_allocator() {
-			// <your code>
+				mySize(0),
+				myMapSize(3),
+				myAllocator(a),
+				myMapAllocator() {
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		explicit MyDeque(size_type s, const_reference v = value_type(), const allocator_type& a = allocator_type()) :
-				_size(s),
-				_outer_array_size(s >> LOG_INNER_SIZE),
-				_allocator(a),
-				_pointer_allocator() {
-			// <your code>
+				mySize(s),
+				myMapSize(s >> LOG_INNERmySize),
+				myAllocator(a),
+				myMapAllocator() {
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		MyDeque(const MyDeque& that) :
-				_size(that._size),
-				_outer_array_size(that._outer_array_size),
-				_allocator(that._allocator),
-				_pointer_allocator(that._pointer_allocator) {
-			// <your code>
+				mySize(that.mySize),
+				myMapSize(that.myMapSize),
+				myAllocator(that.myAllocator),
+				myMapAllocator(that.myMapAllocator) {
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		~MyDeque() {
-			// <your code>
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		MyDeque& operator =(const MyDeque& rhs) {
-			// <your code>
+			// TODO <your code>
 			assert(valid());
 			return *this;
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		reference operator [](size_type index) {
-			// <your code>
+			// TODO <your code>
 			// dummy is just to be able to compile the skeleton, remove it
 			static value_type dummy;
 			return dummy;
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		const_reference operator [](size_type index) const {
 			return const_cast<MyDeque*>(this)->operator[](index);
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		reference at(size_type index) {
-			// <your code>
+			// TODO <your code>
 			// dummy is just to be able to compile the skeleton, remove it
 			static value_type dummy;
 			return dummy;
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		const_reference at(size_type index) const {
 			return const_cast<MyDeque*>(this)->at(index);
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		reference back() {
-			// <your code>
+			// TODO <your code>
 			// dummy is just to be able to compile the skeleton, remove it
 			static value_type dummy;
 			return dummy;
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		const_reference back() const {
 			return const_cast<MyDeque*>(this)->back();
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		iterator begin() {
-			// <your code>
+			// TODO <your code>
 			return iterator(/* <your arguments> */);
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		const_iterator begin() const {
-			// <your code>
+			// TODO <your code>
 			return const_iterator(/* <your arguments> */);
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		void clear() {
-			// <your code>
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		bool empty() const {
 			return !size();
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		iterator end() {
-			// <your code>
+			// TODO <your code>
 			return iterator(/* <your arguments> */);
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		const_iterator end() const {
-			// <your code>
+			// TODO <your code>
 			return const_iterator(/* <your arguments> */);
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		iterator erase(iterator) {
-			--_size;
-			// <your code>
+			--mySize;
+			// TODO <your code>
 			assert(valid());
 			return iterator();
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		reference front() {
-			// <your code>
+			// TODO <your code>
 			// dummy is just to be able to compile the skeleton, remove it
 			static value_type dummy;
 			return dummy;
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		const_reference front() const {
 			return const_cast<MyDeque*>(this)->front();
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		iterator insert(iterator, const_reference) {
-			++_size;
-			// <your code>
+			++mySize;
+			// TODO <your code>
 			// assert(valid());
 			return iterator();
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		void pop_back() {
-			--_size;
-			// <your code>
+			--mySize;
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		void pop_front() {
-			--_size;
-			// <your code>
+			--mySize;
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		void push_back(const_reference) {
-			++_size;
-			// <your code>
+			++mySize;
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		void push_front(const_reference) {
-			++_size;
-			// <your code>
+			++mySize;
+			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		void resize(size_type s, const_reference v = value_type()) {
-			// <your code>
+			// TODO <your code>
 			mySize = s;
 			assert(valid());
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		size_type size() const {
-			return _size;
+			return mySize;
 		}
 
 		/**
-		 * <your documentation>
+		 * TODO <your documentation>
 		 */
 		void swap(MyDeque&) {
-			// <your code>
+			// TODO <your code>
 			assert(valid());
 		}
+
+        /**
+         * TODO <your documentation>
+         */
+        void allocateRow() {
+            // TODO <your code>
+        }
+
+        /**
+         * TODO <your documentation>
+         */
+        void allocateMap(size_type n) {
+            // TODO <your code>
+        }
 };
 
 #endif // Deque_h

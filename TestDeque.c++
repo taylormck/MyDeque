@@ -1135,4 +1135,62 @@ TEST_F(MyDequeTest, DeallocateMapLarge) {
 	x.myMapAllocator.deallocate(p, large);
 }
 
+// --- clearMap ---
+
+TEST_F(MyDequeTest, ClearMapEmpty) {
+	const map_pointer p = x.myMapAllocator.allocate(0);
+	ASSERT_NE(static_cast<const map_pointer>(NULL), p);
+	x.clearMap(p, 0);
+}
+
+TEST_F(MyDequeTest, ClearMapSmall) {
+	const map_pointer p = x.myMapAllocator.allocate(small);
+	ASSERT_NE(static_cast<const map_pointer>(NULL), p);
+	x.clearMap(p, small);
+}
+
+TEST_F(MyDequeTest, ClearMapLarge) {
+	const map_pointer p = x.myMapAllocator.allocate(large);
+	ASSERT_NE(static_cast<const map_pointer>(NULL), p);
+	x.clearMap(p, large);
+}
+
 // --- resizeMap ---
+
+TEST_F(MyDequeTest, ResizeMapEmpty) {
+	x.resizeMap(0);
+	ASSERT_EQ(0, x.myMapSize);
+	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+}
+
+TEST_F(MyDequeTest, ResizeMapSmall) {
+	x.resizeMap(small);
+
+	ASSERT_EQ(small, x.myMapSize);
+
+	map_pointer b = x.myMap;
+	const map_pointer e = b + small;
+
+	while (b != e) {
+		ASSERT_NE(static_cast<const pointer>(NULL), *b);
+		x.myAllocator.deallocate(*b, container::ROW_SIZE);
+		++b;
+	}
+	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+}
+
+TEST_F(MyDequeTest, ResizeMapLarge) {
+	x.resizeMap(large);
+
+	ASSERT_EQ(large, x.myMapSize);
+
+	map_pointer b = x.myMap;
+	const map_pointer e = b + large;
+
+	while (b != e) {
+		ASSERT_NE(static_cast<const pointer>(NULL), *b);
+		x.myAllocator.deallocate(*b, container::ROW_SIZE);
+		++b;
+	}
+	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+}

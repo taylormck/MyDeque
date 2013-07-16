@@ -148,10 +148,30 @@ class MyDeque {
         /**
          * TODO <your documentation>
          */
-        void resizeMap(size_type n) {
-            // TODO <your code>
+        void clearMap(map_pointer map, size_type n) {
+            const map_pointer b = map;
+            const map_pointer e = map + n;
+            while (map != e) {
+            	destroy(myAllocator, *map, *map + ROW_SIZE);
+            	++map;
+            }
+            deallocateMap(b, n);
         }
 
+        /**
+         * TODO <your documentation>
+         */
+        void resizeMap(size_type n) {
+            // TODO <your code>
+            // const map_pointer newMap = allocateMap(n);
+        }
+
+        /**
+         * TODO <your documentation>
+         */
+        void growMap() {
+        	resizeMap(3 * myMapSize);
+        }
 
 	public:
 
@@ -442,7 +462,8 @@ class MyDeque {
 				mySize(0),
 				myMapSize(3),
 				myAllocator(a),
-				myMapAllocator() {
+				myMapAllocator(),
+				myMap(NULL) {
 			// TODO <your code>
 			assert(valid());
 		}
@@ -451,10 +472,11 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		explicit MyDeque(size_type s, const_reference v = value_type(), const allocator_type& a = allocator_type()) :
-				mySize(s),
-				myMapSize(s >> LOG_ROW_SIZE),
+				mySize(0),
+				myMapSize(0),
 				myAllocator(a),
-				myMapAllocator() {
+				myMapAllocator(),
+				myMap(NULL) {
 			// TODO <your code>
 			assert(valid());
 		}
@@ -463,10 +485,11 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		MyDeque(const MyDeque& that) :
-				mySize(that.mySize),
-				myMapSize(that.myMapSize),
+				mySize(0),
+				myMapSize(0),
 				myAllocator(that.myAllocator),
-				myMapAllocator(that.myMapAllocator) {
+				myMapAllocator(that.myMapAllocator),
+				myMap(NULL) {
 			// TODO <your code>
 			assert(valid());
 		}

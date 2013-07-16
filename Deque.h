@@ -135,17 +135,23 @@ class MyDeque {
          * TODO <your documentation>
          */
         map_pointer allocateMap(size_type n) {
-            // TODO <your code>
-
-            return NULL; // TODO Clear dummy return
+            return myMapAllocator.allocate(n);
         }
 
         /**
          * TODO <your documentation>
          */
         void deallocateMap(map_pointer map, size_type n) {
+            myMapAllocator.deallocate(map, n);
+        }
+
+        /**
+         * TODO <your documentation>
+         */
+        void resizeMap(size_type n) {
             // TODO <your code>
         }
+
 
 	public:
 

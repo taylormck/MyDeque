@@ -42,19 +42,16 @@
 template <typename C>
 class DequeTest : public testing::Test {
 	protected:
+		typedef C container;
 		typedef typename C::value_type T;
 		std::allocator<T> a;
-		C x, y, allocator_constructed, size_construced, copy_constructed;
+		container x, y;
 
 		// This needs to be large enough that the data will span past
 		// a single array
 		const size_t s;
 
 		DequeTest() :
-			x(), y(),
-			allocator_constructed(a),
-			size_construced(10, 5),
-			copy_constructed(size_construced),
 			s(10000)
 		{}
 
@@ -86,6 +83,42 @@ class DequeTest : public testing::Test {
 
 typedef testing::Types<std::deque<int>, MyDeque<int> > MyDeques;
 TYPED_TEST_CASE(DequeTest, MyDeques);
+
+// --- Constructors ---
+
+TYPED_TEST(DequeTest, AllocatorConstructor) {
+	EXPECT_EQ(0, this->x.size());
+	EXPECT_EQ(0, this->y.size());
+}
+
+TYPED_TEST(DequeTest, SizedConstructor) {
+	typename TestFixture::container v(10, 5);
+	ASSERT_EQ(10, v.size());
+	for (int i = 0; i < 10; ++i)
+		EXPECT_EQ(5, v[i]);
+}
+
+TYPED_TEST(DequeTest, CopyConstructor) {
+	this->SetSame();
+	typename TestFixture::container v = this->x;
+	ASSERT_EQ(this->x.size(), v.size());
+
+	for(unsigned int i = 0; i < v.size(); ++i)
+		EXPECT_EQ(this->x[i], v[i]);
+}
+
+// --- Copy Assignment ---
+
+TYPED_TEST(DequeTest, CopyAssignment) {
+	this->SetDifferent();
+	EXPECT_EQ(3, this->y[5]);
+
+	this->y = this->x;
+
+	ASSERT_EQ(this->x.size(), this->y.size());
+	for (unsigned int i = 0; i < this->x.size(); ++i)
+		EXPECT_EQ(this->x[i], this->y[i]);
+}
 
 // --- operator == ---
 
@@ -221,41 +254,6 @@ TYPED_TEST(DequeTest, GreaterThanEqualLarge) {
 	EXPECT_GE(this->y, this->x);
 	this->x[0] = 0;
 	EXPECT_GE(this->y, this->x);
-}
-
-// --- Constructors ---
-// TODO fix these tests to actually call the constructor
-// use TestFixture::C
-
-TYPED_TEST(DequeTest, AllocatorConstructor) {
-	EXPECT_EQ(0, this->x.size());
-	EXPECT_EQ(0, this->y.size());
-}
-
-TYPED_TEST(DequeTest, SizedConstructor) {
-	ASSERT_EQ(10, this->size_construced.size());
-	for (int i = 0; i < 10; ++i)
-		EXPECT_EQ(5, this->size_construced[i]);
-}
-
-TYPED_TEST(DequeTest, CopyConstructor) {
-	ASSERT_EQ(this->size_construced.size(), this->copy_constructed.size());
-
-	for(unsigned int i = 0; i < this->size_construced.size(); ++i)
-		EXPECT_EQ(this->size_construced[i], this->copy_constructed[i]);
-}
-
-// --- Copy Assignment ---
-
-TYPED_TEST(DequeTest, CopyAssignment) {
-	this->SetDifferent();
-	EXPECT_EQ(3, this->y[5]);
-
-	this->y = this->x;
-
-	ASSERT_EQ(this->x.size(), this->y.size());
-	for (unsigned int i = 0; i < this->x.size(); ++i)
-		EXPECT_EQ(this->x[i], this->y[i]);
 }
 
 // --- operator [] ---
@@ -621,7 +619,9 @@ class IteratorTest : public testing::Test {
 		C x, y;
 		iterator i, j;
 		value_type m, n;
-		difference_type s;
+		const difference_type s;
+
+		IteratorTest() : s(0) {}
 
 		void SetUpBegin() {
 			x.push_back(0);
@@ -644,7 +644,6 @@ class IteratorTest : public testing::Test {
 		}
 
 		void Push() {
-			s = 1000;
 			for (unsigned int count = 0; count < s; ++count)
 				x.push_front(9);
 			for (unsigned int count = 0; count < s; ++count)
@@ -969,12 +968,32 @@ TYPED_TEST(IteratorTest, Insert) {
 template<typename T>
 class MyDequeTest : public testing::Test {
 	protected:
+		typedef typename MyDeque<T>::value_type value_type;
 		typedef typename MyDeque<T>::iterator iterator;
+		typedef typename MyDeque<T>::const_iterator const_iterator;
+		typedef typename MyDeque<T>::difference_type difference_type;
+		typedef typename MyDeque<T>::allocator_type allocator_type;
 		MyDeque<T> x, y;
+		iterator i, j;
+		const difference_type s;
+
+		MyDequeTest() : s(10000) {}
 };
 
 typedef testing::Types<int, char, std::string> MyTypes;
 TYPED_TEST_CASE(MyDequeTest, MyTypes);
+
+// --- default constructor ---
+
+TYPED_TEST(MyDequeTest, DefaultConstructor) {
+	ASSERT_EQ(0, this->x.size());
+	ASSERT_EQ(0, this->y.size());
+
+	typename TestFixture::allocator_type a;
+
+	ASSERT_EQ(a, this->x._allocator);
+	ASSERT_EQ(a, this->y._allocator);
+}
 
 // --- valid ---
 // TODO

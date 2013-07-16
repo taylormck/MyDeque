@@ -99,14 +99,14 @@ class MyDeque {
 		}
 
 	private:
-		const static int LOG_INNERmySize = 7;
-		const static size_type INNER_ARRAYmySize = 1 << LOG_INNERmySize;
+		const static int LOG_ROW_SIZE = 7;
+		const static size_type ROW_SIZE = 1 << LOG_ROW_SIZE;
 
 		size_type mySize;
 		size_type myMapSize;
 		
 		allocator_type myAllocator;
-		mapmyAllocator_type myMapAllocator;
+		map_allocator_type myMapAllocator;
 		
 		map_pointer myMap ;
 
@@ -122,6 +122,8 @@ class MyDeque {
          */
         pointer allocateRow() {
             // TODO <your code>
+
+            return NULL; // TODO Clear dummy return
         }
 
         /**
@@ -136,6 +138,8 @@ class MyDeque {
          */
         map_pointer allocateMap(size_type n) {
             // TODO <your code>
+
+            return NULL; // TODO Clear dummy return
         }
 
         /**
@@ -444,7 +448,7 @@ class MyDeque {
 		 */
 		explicit MyDeque(size_type s, const_reference v = value_type(), const allocator_type& a = allocator_type()) :
 				mySize(s),
-				myMapSize(s >> LOG_INNERmySize),
+				myMapSize(s >> LOG_ROW_SIZE),
 				myAllocator(a),
 				myMapAllocator() {
 			// TODO <your code>

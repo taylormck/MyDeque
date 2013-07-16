@@ -1130,7 +1130,7 @@ TEST_F(MyDequeTest, AllocateMapLarge) {
 }
 
 // --- deallocateMap ---
-// TODO
+
 TEST_F(MyDequeTest, DeallocateMapZero) {
 	const map_pointer p = x.myMapAllocator.allocate(0);
 	ASSERT_NE(static_cast<const map_pointer>(NULL), p);

@@ -121,16 +121,14 @@ class MyDeque {
          * TODO <your documentation>
          */
         pointer allocateRow() {
-            // TODO <your code>
-
-            return NULL; // TODO Clear dummy return
+            return myAllocator.allocate(ROW_SIZE);
         }
 
         /**
          * TODO <your documentation>
          */
-        void deallocateRow(pointer rowToDelete) {
-            // TODO <your code>
+        void deallocateRow(pointer row) {
+        	myAllocator.deallocate(row, ROW_SIZE);
         }
 
         /**
@@ -145,7 +143,7 @@ class MyDeque {
         /**
          * TODO <your documentation>
          */
-        void deallocateMap(map_pointer mapToDelete, size_type n) {
+        void deallocateMap(map_pointer map, size_type n) {
             // TODO <your code>
         }
 

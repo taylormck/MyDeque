@@ -1151,26 +1151,6 @@ TEST_F(MyDequeTest, DeallocateMapLarge) {
 	x.myMapAllocator.deallocate(p, large);
 }
 
-// --- clearMap ---
-
-TEST_F(MyDequeTest, ClearMapEmpty) {
-	const map_pointer p = x.myMapAllocator.allocate(0);
-	ASSERT_NE(static_cast<const map_pointer>(NULL), p);
-	x.clearMap(p, 0);
-}
-
-TEST_F(MyDequeTest, ClearMapSmall) {
-	const map_pointer p = x.myMapAllocator.allocate(small);
-	ASSERT_NE(static_cast<const map_pointer>(NULL), p);
-	x.clearMap(p, small);
-}
-
-TEST_F(MyDequeTest, ClearMapLarge) {
-	const map_pointer p = x.myMapAllocator.allocate(large);
-	ASSERT_NE(static_cast<const map_pointer>(NULL), p);
-	x.clearMap(p, large);
-}
-
 // --- resizeMap ---
 
 TEST_F(MyDequeTest, ResizeMapEmpty) {
@@ -1229,7 +1209,6 @@ TEST_F(MyDequeTest, GrowMap) {
 	x.growMap();
 
 	EXPECT_EQ(s, x.myMapSize);
-	this->CleanX();
 }
 
 TEST_F(MyDequeTest, GrowMapTwice) {
@@ -1242,8 +1221,6 @@ TEST_F(MyDequeTest, GrowMapTwice) {
 	x.growMap();
 
 	EXPECT_EQ(s, x.myMapSize);
-
-	this->CleanX();
 }
 
 TEST_F(MyDequeTest, GrowMapRepeated) {
@@ -1259,5 +1236,4 @@ TEST_F(MyDequeTest, GrowMapRepeated) {
 	}	
 
 	EXPECT_EQ(s, x.myMapSize);
-	this->CleanX();
 }

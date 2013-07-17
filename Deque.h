@@ -148,19 +148,6 @@ class MyDeque {
         /**
          * TODO <your documentation>
          */
-        void clearMap(map_pointer map, size_type n) {
-            const map_pointer b = map;
-            const map_pointer e = map + n;
-            while (map != e) {
-            	destroy(myAllocator, *map, *map + ROW_SIZE);
-            	++map;
-            }
-            deallocateMap(b, n);
-        }
-
-        /**
-         * TODO <your documentation>
-         */
         void resizeMap(size_type n) {
             // TODO <your code>
         	// Case 1, we are already size n
@@ -198,7 +185,7 @@ class MyDeque {
          * TODO <your documentation>
          */
         void growMap() {
-        	resizeMap(3 * myMapSize);
+        	resizeMap(3 * std::max(static_cast<size_type>(1), myMapSize));
         }
 
 	public:

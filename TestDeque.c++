@@ -1194,3 +1194,70 @@ TEST_F(MyDequeTest, ResizeMapLarge) {
 	}
 	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
 }
+
+// --- growMap ---
+
+TEST_F(MyDequeTest, GrowMap) {
+	x.myMap = x.myMapAllocator.allocate(1);
+	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
+	const size_type s = 3;
+
+	x.growMap();
+
+	ASSERT_EQ(s, x.myMapSize);
+
+	map_pointer b = x.myMap;
+	const map_pointer e = b + s;
+
+	while (b != e) {
+		ASSERT_NE(static_cast<const pointer>(NULL), *b);
+		x.myAllocator.deallocate(*b, container::ROW_SIZE);
+		++b;
+	}
+	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+}
+
+TEST_F(MyDequeTest, GrowMapTwice) {
+	x.myMap = x.myMapAllocator.allocate(1);
+	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
+	const size_type s = 9;
+
+	x.growMap();
+	x.growMap();
+
+	ASSERT_EQ(s, x.myMapSize);
+
+	map_pointer b = x.myMap;
+	const map_pointer e = b + s;
+
+	while (b != e) {
+		ASSERT_NE(static_cast<const pointer>(NULL), *b);
+		x.myAllocator.deallocate(*b, container::ROW_SIZE);
+		++b;
+	}
+	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+}
+
+TEST_F(MyDequeTest, GrowMapRepeated) {
+	x.myMap = x.myMapAllocator.allocate(1);
+	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
+	size_type baseS = 3;
+	size_type numGrows = 10;
+	size_type s = std::pow(baseS, numGrows);
+
+	for(size_type k = 0; k < numGrows; ++k) {
+		x.growMap();
+	}	
+
+	ASSERT_EQ(s, x.myMapSize);
+
+	map_pointer b = x.myMap;
+	const map_pointer e = b + s;
+
+	while (b != e) {
+		ASSERT_NE(static_cast<const pointer>(NULL), *b);
+		x.myAllocator.deallocate(*b, container::ROW_SIZE);
+		++b;
+	}
+	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+}

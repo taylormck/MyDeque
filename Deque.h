@@ -460,7 +460,7 @@ class MyDeque {
 		 */
 		explicit MyDeque(const allocator_type& a = allocator_type()) :
 				mySize(0),
-				myMapSize(3),
+				myMapSize(0),
 				myAllocator(a),
 				myMapAllocator(),
 				myMap(NULL) {

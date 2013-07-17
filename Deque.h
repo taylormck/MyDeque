@@ -225,6 +225,27 @@ class MyDeque {
                     return true;
                 }
 
+                /**
+                 * TODO <your documentation>
+                 */
+                friend bool operator <= (const iterator& lhs, const iterator& rhs) {
+                    return !(rhs < lhs);
+                }
+
+                /**
+                 * TODO <your documentation>
+                 */
+                friend bool operator > (const iterator& lhs, const iterator& rhs) {
+                    return rhs < lhs;
+                }
+
+                /**
+                 * TODO <your documentation>
+                 */
+                friend bool operator >= (const iterator& lhs, const iterator& rhs) {
+                    return !(lhs < rhs);
+                }
+
 				/**
 				 * TODO <your documentation>
 				 */
@@ -374,6 +395,27 @@ class MyDeque {
                     // TODO <your code>
                     // TODO add tests for <
                     return true;
+                }
+
+                /**
+                 * TODO <your documentation>
+                 */
+                friend bool operator <= (const const_iterator& lhs, const const_iterator& rhs) {
+                    return !(rhs < lhs);
+                }
+
+                /**
+                 * TODO <your documentation>
+                 */
+                friend bool operator > (const const_iterator& lhs, const const_iterator& rhs) {
+                    return rhs < lhs;
+                }
+
+                /**
+                 * TODO <your documentation>
+                 */
+                friend bool operator >= (const const_iterator& lhs, const const_iterator& rhs) {
+                    return !(lhs < rhs);
                 }
 
 				/**

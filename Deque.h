@@ -368,8 +368,7 @@ class MyDeque {
                     difference_type offset = d + (currentItem - rowBegin);
 
                     // Same row
-                    if (offset >= 0 
-                    	&& offset < ROW_SIZE)
+                    if (offset >= 0 && offset < ROW_SIZE)
                         currentItem += d;
 
                     else {

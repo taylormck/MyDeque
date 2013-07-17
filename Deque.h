@@ -251,11 +251,19 @@ class MyDeque {
 				}
 
 			public:
+                /**
+                 * TODO <your documentation>
+                 */
+                iterator() {
+                    // TODO <your code>
+                    // assert(valid());
+                }
+
 
 				/**
 				 * TODO <your documentation>
 				 */
-				iterator(/* <your arguments> */) {
+				iterator(pointer item, map_pointer row) {
 					// TODO <your code>
 					// assert(valid());
 				}
@@ -395,7 +403,7 @@ class MyDeque {
 				/**
 				 * TODO <your documentation>
 				 */
-				const_iterator(/* <your arguments> */) {
+				const_iterator(pointer item, map_pointer row) {
 					// TODO <your code>
 					assert(valid());
 				}
@@ -608,7 +616,8 @@ class MyDeque {
 		 */
 		const_iterator begin() const {
 			// TODO <your code>
-			return const_iterator(/* <your arguments> */);
+
+			return const_iterator(iterator());
 		}
 
 		/**
@@ -639,7 +648,7 @@ class MyDeque {
 		 */
 		const_iterator end() const {
 			// TODO <your code>
-			return const_iterator(/* <your arguments> */);
+			return const_iterator(iterator());
 		}
 
 		/**

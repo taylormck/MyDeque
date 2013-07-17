@@ -102,8 +102,8 @@ class MyDeque {
         class iterator;
 
 	private:
-		const static int LOG_ROW_SIZE = 7;
-		const static size_type ROW_SIZE = 1 << LOG_ROW_SIZE;
+		const static unsigned int LOG_ROW_SIZE = 7;
+		const static difference_type ROW_SIZE = 1 << LOG_ROW_SIZE;
 
 		size_type mySize;
 		size_type myMapSize;
@@ -120,6 +120,11 @@ class MyDeque {
 
 		bool valid() const {
 			// TODO <your code>
+			if (myMap == NULL)
+				return false;
+			if (myBegin > myEnd)
+				return false;
+
 			return true;
 		}
 
@@ -199,14 +204,6 @@ class MyDeque {
 		class iterator {
 			public:
 
-				typedef std::random_access_iterator_tag iterator_category;
-				typedef typename MyDeque::value_type value_type;
-				typedef typename MyDeque::difference_type difference_type;
-				typedef typename MyDeque::pointer pointer;
-				typedef typename MyDeque::reference reference;
-
-			public:
-
 				/**
 				 * TODO <your documentation>
 				 */
@@ -230,7 +227,7 @@ class MyDeque {
                     // if they're equal
                     return (lhs.currentRow == rhs.currentRow) ?
                             (lhs.currentItem < rhs.currentItem):
-                            (lhs.currentItem < lhs.currentRow);
+                            (lhs.currentRow < lhs.currentRow);
                 }
 
                 /**
@@ -278,7 +275,7 @@ class MyDeque {
 
 				bool valid() const {
 					// TODO <your code>
-					return true;
+					return ((currentRow != NULL) && (currentItem != NULL));
 				}
 
                 void setRow(map_pointer newRow) {
@@ -327,6 +324,7 @@ class MyDeque {
 				 */
 				iterator& operator ++() {
 					// TODO <your code>
+					*this += 1;
 					assert(valid());
 					return *this;
 				}
@@ -346,6 +344,7 @@ class MyDeque {
 				 */
 				iterator& operator --() {
 					// TODO <your code>
+					*this += -1;
 					assert(valid());
 					return *this;
 				}
@@ -365,24 +364,26 @@ class MyDeque {
 				 */
 				iterator& operator +=(difference_type d) {
 					// TODO <your code>
-                    // difference_type offset = d + (currentItem - rowBegin);
+					assert(valid());
+                    difference_type offset = d + (currentItem - rowBegin);
 
-                    // // Same row
-                    // if (offset >= 0 && offset < ROW_SIZE)
-                    //     currentItem += d;
+                    // Same row
+                    if (offset >= 0 
+                    	&& offset < ROW_SIZE)
+                        currentItem += d;
 
-                    // else {
-                    //     // Move to next row
-                    //     difference_type rowOffset;
-                    //     if (offset > 0)
-                    //         rowOffset = offset >> LOG_ROW_SIZE;
-                    //     // Move to previous row
-                    //     else {
-                    //         rowOffset = -difference_type((-offset - 1) >> LOG_ROW_SIZE) - 1;
-                    //     }
-                    //     setRow(currentRow + rowOffset);
-                    //     currentItem = rowBegin + (offset - rowOffset << LOG_ROW_SIZE);
-                    // }
+                    else {
+                        // Move to next row
+                        difference_type rowOffset;
+                        if (offset > 0)
+                            rowOffset = offset >> LOG_ROW_SIZE;
+                        // Move to previous row
+                        else {
+                            rowOffset = -difference_type((-offset - 1) >> LOG_ROW_SIZE) - 1;
+                        }
+                        setRow(currentRow + rowOffset);
+                        currentItem = rowBegin + (offset - (rowOffset << LOG_ROW_SIZE));
+                    }
 
 					assert(valid());
 					return *this;
@@ -577,7 +578,9 @@ class MyDeque {
 				myAllocator(a),
 				myMapAllocator(),
 				myMap(NULL) {
-			// TODO <your code>
+			resizeMap(1);
+			myBegin = iterator(*myMap + (ROW_SIZE >> 1), myMap);
+			myEnd = myBegin;
 			assert(valid());
 		}
 
@@ -585,12 +588,15 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		explicit MyDeque(size_type s, const_reference v = value_type(), const allocator_type& a = allocator_type()) :
-				mySize(0),
+				mySize(s),
 				myMapSize(0),
 				myAllocator(a),
 				myMapAllocator(),
 				myMap(NULL) {
-			// TODO <your code>
+			resizeMap((s >> LOG_ROW_SIZE) + 1);
+			myBegin = iterator(*myMap, myMap);
+			myEnd = myBegin + s;
+			uninitialized_fill(myAllocator, myBegin, myEnd, v);
 			assert(valid());
 		}
 
@@ -598,12 +604,15 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		MyDeque(const MyDeque& that) :
-				mySize(0),
+				mySize(that.mySize),
 				myMapSize(0),
 				myAllocator(that.myAllocator),
 				myMapAllocator(that.myMapAllocator),
 				myMap(NULL) {
 			// TODO <your code>
+			resizeMap((that.mySize >> LOG_ROW_SIZE) + 1);
+			myBegin = iterator(*myMap, myMap);
+			myEnd = uninitialized_copy(myAllocator, that.myBegin, that.myEnd, myBegin);
 			assert(valid());
 		}
 
@@ -611,7 +620,12 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		~MyDeque() {
-			// TODO <your code>
+			destroy(myAllocator, myBegin, myEnd);
+
+			for (size_type k = 0; k < myMapSize; ++k)
+				deallocateRow(*(myMap + k));
+
+			deallocateMap(myMap, myMapSize);
 			assert(valid());
 		}
 

@@ -98,6 +98,9 @@ class MyDeque {
 			return true;
 		}
 
+    public:
+        class iterator;
+
 	private:
 		const static int LOG_ROW_SIZE = 7;
 		const static size_type ROW_SIZE = 1 << LOG_ROW_SIZE;
@@ -108,7 +111,10 @@ class MyDeque {
 		allocator_type myAllocator;
 		map_allocator_type myMapAllocator;
 		
-		map_pointer myMap ;
+		map_pointer myMap;
+
+        iterator myBegin;
+        iterator myEnd;
 
 	private:
 
@@ -204,9 +210,9 @@ class MyDeque {
 				/**
 				 * TODO <your documentation>
 				 */
-				friend bool operator ==(const iterator& lhs, const iterator& rhs) {
-					// TODO <your code>
-					return true;
+				friend bool operator ==(const iterator& lhs, const iterator& rhs) {\
+					return ((lhs.currentRow == rhs.currentRow) &&
+                        (lhs.currentItem == rhs.currentItem));
 				}
 
 				/**
@@ -220,9 +226,11 @@ class MyDeque {
                  * TODO <your documentation>
                  */
                 friend bool operator < (const iterator& lhs, const iterator& rhs) {
-                    // TODO <your code>
-                    // TODO add tests for <
-                    return true;
+                    // Compare rows first
+                    // if they're equal
+                    return (lhs.currentRow == rhs.currentRow) ?
+                            (lhs.currentItem < rhs.currentItem):
+                            (lhs.currentItem < lhs.currentRow);
                 }
 
                 /**
@@ -261,8 +269,10 @@ class MyDeque {
 				}
 
 			private:
-
-				// TODO <your data>
+                pointer currentItem;
+                pointer rowBegin;
+                pointer rowEnd;
+                map_pointer currentRow;
 
 			private:
 
@@ -271,23 +281,29 @@ class MyDeque {
 					return true;
 				}
 
-			public:
-                /**
-                 * TODO <your documentation>
-                 */
-                iterator() {
-                    // TODO <your code>
-                    // assert(valid());
+                void setRow(map_pointer newRow) {
+                    currentRow = newRow;
+                    rowBegin = *newRow;
+                    rowEnd = rowBegin + ROW_SIZE;
                 }
 
+			public:
+                /**
+                 * Creates an empty iterator
+                 * Does NOT create a valid iterator
+                 */
+                iterator() :
+                        currentItem(NULL), rowBegin(NULL), rowEnd(NULL),
+                        currentRow(NULL)
+                {}
 
 				/**
 				 * TODO <your documentation>
 				 */
-				iterator(pointer item, map_pointer row) {
-					// TODO <your code>
-					// assert(valid());
-				}
+				iterator(pointer item, map_pointer row):
+                        currentItem(item), rowBegin(*row),
+                        rowEnd(rowBegin + ROW_SIZE) 
+                {}
 
 				/**
 				 * TODO <your documentation>
@@ -349,6 +365,25 @@ class MyDeque {
 				 */
 				iterator& operator +=(difference_type d) {
 					// TODO <your code>
+                    // difference_type offset = d + (currentItem - rowBegin);
+
+                    // // Same row
+                    // if (offset >= 0 && offset < ROW_SIZE)
+                    //     currentItem += d;
+
+                    // else {
+                    //     // Move to next row
+                    //     difference_type rowOffset;
+                    //     if (offset > 0)
+                    //         rowOffset = offset >> LOG_ROW_SIZE;
+                    //     // Move to previous row
+                    //     else {
+                    //         rowOffset = -difference_type((-offset - 1) >> LOG_ROW_SIZE) - 1;
+                    //     }
+                    //     setRow(currentRow + rowOffset);
+                    //     currentItem = rowBegin + (offset - rowOffset << LOG_ROW_SIZE);
+                    // }
+
 					assert(valid());
 					return *this;
 				}
@@ -357,7 +392,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				iterator& operator -=(difference_type d) {
-					// TODO <your code>
+					*this += -d;
 					assert(valid());
 					return *this;
 				}
@@ -453,15 +488,10 @@ class MyDeque {
                 /**
                  * TODO <your documentation>
                  */
-                const_iterator(iterator) {
+                const_iterator(iterator rhs) {
                     // TODO <your code>
                     assert(valid());
                 }
-
-				// Default copy, destructor, and copy assignment.
-				// const_iterator (const const_iterator&);
-				// ~const_iterator ();
-				// const_iterator& operator = (const const_iterator&);
 
 				/**
 				 * TODO <your documentation>

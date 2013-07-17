@@ -193,7 +193,7 @@ class MyDeque {
 		class iterator {
 			public:
 
-				typedef std::bidirectional_iterator_tag iterator_category;
+				typedef std::random_access_iterator_tag iterator_category;
 				typedef typename MyDeque::value_type value_type;
 				typedef typename MyDeque::difference_type difference_type;
 				typedef typename MyDeque::pointer pointer;
@@ -215,6 +215,15 @@ class MyDeque {
 				friend bool operator !=(const iterator& lhs, const iterator& rhs) {
 					return !(lhs == rhs);
 				}
+
+                /**
+                 * TODO <your documentation>
+                 */
+                friend bool operator < (const iterator& lhs, const iterator& rhs) {
+                    // TODO <your code>
+                    // TODO add tests for <
+                    return true;
+                }
 
 				/**
 				 * TODO <your documentation>
@@ -328,7 +337,7 @@ class MyDeque {
 	public:
 		class const_iterator {
 			public:
-				typedef std::bidirectional_iterator_tag iterator_category;
+				typedef std::random_access_iterator_tag iterator_category;
 				typedef typename MyDeque::value_type value_type;
 				typedef typename MyDeque::difference_type difference_type;
 				typedef typename MyDeque::const_pointer pointer;
@@ -349,6 +358,15 @@ class MyDeque {
 				friend bool operator !=(const const_iterator& lhs, const const_iterator& rhs) {
 					return !(lhs == rhs);
 				}
+
+                /**
+                 * TODO <your documentation>
+                 */
+                friend bool operator < (const const_iterator& lhs, const const_iterator& rhs) {
+                    // TODO <your code>
+                    // TODO add tests for <
+                    return true;
+                }
 
 				/**
 				 * TODO <your documentation>

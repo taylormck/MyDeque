@@ -983,6 +983,22 @@ class MyDequeTest : public testing::Test {
 		const size_type small, large;
 
 		MyDequeTest() : v(5), small(10), large(10000) {}
+
+		void CleanX() {
+			// They're just ints, so no need to call a destructor
+			if (x.myMapSize != 0) {
+				map_pointer b = x.myMap;
+				if (b != NULL) {
+					const map_pointer e = b + x.myMapSize;
+
+					while (b != e) {
+						if (*b != NULL)
+							x.myAllocator.deallocate(*b, container::ROW_SIZE);
+					}
+					x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+				}
+			}
+		}
 };
 
 // --- default constructor ---
@@ -1159,65 +1175,65 @@ TEST_F(MyDequeTest, ClearMapLarge) {
 
 TEST_F(MyDequeTest, ResizeMapEmpty) {
 	x.resizeMap(0);
-	ASSERT_EQ(0, x.myMapSize);
+	EXPECT_EQ(0, x.myMapSize);
 	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
 }
 
 TEST_F(MyDequeTest, ResizeMapSmall) {
+	this->CleanX();
 	x.resizeMap(small);
 
-	ASSERT_EQ(small, x.myMapSize);
+	EXPECT_EQ(small, x.myMapSize);
 
-	map_pointer b = x.myMap;
-	const map_pointer e = b + small;
-
-	while (b != e) {
-		ASSERT_NE(static_cast<const pointer>(NULL), *b);
-		x.myAllocator.deallocate(*b, container::ROW_SIZE);
-		++b;
-	}
-	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+	// this->CleanX();
 }
 
 TEST_F(MyDequeTest, ResizeMapLarge) {
+	this->CleanX();
 	x.resizeMap(large);
 
-	ASSERT_EQ(large, x.myMapSize);
+	EXPECT_EQ(large, x.myMapSize);
+}
 
-	map_pointer b = x.myMap;
-	const map_pointer e = b + large;
+TEST_F(MyDequeTest, ResizeMapSameSize) {
+	this->CleanX();
+	x.resizeMap(small);
+	EXPECT_EQ(small, x.myMapSize);
+	const map_pointer oldMyMap = x.myMap;
+	x.resizeMap(small);
+	EXPECT_EQ(small, x.myMapSize);
+	EXPECT_EQ(oldMyMap, x.myMap);
+}
 
-	while (b != e) {
-		ASSERT_NE(static_cast<const pointer>(NULL), *b);
-		x.myAllocator.deallocate(*b, container::ROW_SIZE);
-		++b;
-	}
-	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+TEST_F(MyDequeTest, ResizeMapSmaller) {
+	this->CleanX();
+	const size_type smaller = small - 3;
+	x.resizeMap(small);
+	ASSERT_EQ(small, x.myMapSize);
+	std::vector<pointer> copy (x.myMap, x.myMap + small);
+
+	x.resizeMap(smaller);
+	EXPECT_EQ(smaller, x.myMapSize);
+	for (unsigned int k = 0; k < smaller; ++k)
+		EXPECT_EQ(copy[k], *(x.myMap + k));
 }
 
 // --- growMap ---
 
 TEST_F(MyDequeTest, GrowMap) {
+	this->CleanX();
 	x.myMap = x.myMapAllocator.allocate(1);
 	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
 	const size_type s = 3;
 
 	x.growMap();
 
-	ASSERT_EQ(s, x.myMapSize);
-
-	map_pointer b = x.myMap;
-	const map_pointer e = b + s;
-
-	while (b != e) {
-		ASSERT_NE(static_cast<const pointer>(NULL), *b);
-		x.myAllocator.deallocate(*b, container::ROW_SIZE);
-		++b;
-	}
-	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+	EXPECT_EQ(s, x.myMapSize);
+	this->CleanX();
 }
 
 TEST_F(MyDequeTest, GrowMapTwice) {
+	this->CleanX();
 	x.myMap = x.myMapAllocator.allocate(1);
 	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
 	const size_type s = 9;
@@ -1225,20 +1241,13 @@ TEST_F(MyDequeTest, GrowMapTwice) {
 	x.growMap();
 	x.growMap();
 
-	ASSERT_EQ(s, x.myMapSize);
+	EXPECT_EQ(s, x.myMapSize);
 
-	map_pointer b = x.myMap;
-	const map_pointer e = b + s;
-
-	while (b != e) {
-		ASSERT_NE(static_cast<const pointer>(NULL), *b);
-		x.myAllocator.deallocate(*b, container::ROW_SIZE);
-		++b;
-	}
-	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+	this->CleanX();
 }
 
 TEST_F(MyDequeTest, GrowMapRepeated) {
+	this->CleanX();
 	x.myMap = x.myMapAllocator.allocate(1);
 	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
 	size_type baseS = 3;
@@ -1249,15 +1258,6 @@ TEST_F(MyDequeTest, GrowMapRepeated) {
 		x.growMap();
 	}	
 
-	ASSERT_EQ(s, x.myMapSize);
-
-	map_pointer b = x.myMap;
-	const map_pointer e = b + s;
-
-	while (b != e) {
-		ASSERT_NE(static_cast<const pointer>(NULL), *b);
-		x.myAllocator.deallocate(*b, container::ROW_SIZE);
-		++b;
-	}
-	x.myMapAllocator.deallocate(x.myMap, x.myMapSize);
+	EXPECT_EQ(s, x.myMapSize);
+	this->CleanX();
 }

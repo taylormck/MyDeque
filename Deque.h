@@ -163,7 +163,35 @@ class MyDeque {
          */
         void resizeMap(size_type n) {
             // TODO <your code>
-            // const map_pointer newMap = allocateMap(n);
+        	// Case 1, we are already size n
+        	if (n == myMapSize)
+        		return;
+
+            const map_pointer newMap = allocateMap(n);
+        	
+        	// Case 2, we are larger than size n
+        	if (n < myMapSize) {
+        		uninitialized_copy(myMapAllocator, myMap, myMap + n, newMap);
+        	}
+
+        	// Case 3, n is larger than us
+        	else {
+        		assert(n > myMapSize);
+
+        		map_pointer b = newMap;
+        		map_pointer firstStop = b + ((n - myMapSize) / 2);
+        		map_pointer e = newMap + n;
+
+        		while(b != firstStop)
+        			*b++ = allocateRow();
+        		b = uninitialized_copy(myMapAllocator, myMap, myMap + myMapSize, b);
+        		while(b != e)
+        			*b++ = allocateRow(); 
+        	}
+
+        	deallocateMap(myMap, myMapSize);
+        	myMap = newMap;
+        	myMapSize = n;
         }
 
         /**

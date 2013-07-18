@@ -7,6 +7,8 @@
 #ifndef Deque_h
 #define Deque_h
 
+#include <iostream>
+
 #include <algorithm> // copy, equal, lexicographical_compare, max, swap
 #include <cassert>   // assert
 #include <iterator>  // iterator, bidirectional_iterator_tag
@@ -160,33 +162,36 @@ class MyDeque {
          * TODO <your documentation>
          */
         void resizeMap(size_type n) {
-            // TODO <your code>
         	// Case 1, we are already size n
         	if (n == myMapSize)
         		return;
 
-            const map_pointer newMap = allocateMap(n);
         	
         	// Case 2, we are larger than size n
         	if (n < myMapSize) {
-        		uninitialized_copy(myMapAllocator, myMap, myMap + n, newMap);
+                // TODO memory leak, need to deallocate rows
+        		map_pointer b = myMap + n;
+                map_pointer e = myMap + myMapSize;
+                while (b != e)
+                    deallocateRow(*b++);
+                myMapSize = n;
+                return;
         	}
 
         	// Case 3, n is larger than us
-        	else {
-        		assert(n > myMapSize);
+    		assert(n > myMapSize);
 
-        		map_pointer b = newMap;
-        		map_pointer firstStop = b + ((n - myMapSize) / 2);
-        		map_pointer e = newMap + n;
+            const map_pointer newMap = allocateMap(n);
 
-        		while(b != firstStop)
-        			*b++ = allocateRow();
-        		b = uninitialized_copy(myMapAllocator, myMap, myMap + myMapSize, b);
-        		while(b != e)
-        			*b++ = allocateRow(); 
-        	}
+    		map_pointer b = newMap;
+    		map_pointer firstStop = b + ((n - myMapSize) >> 1);
+    		map_pointer e = newMap + n;
 
+    		while(b != firstStop)
+    			*b++ = allocateRow();
+    		b = std::copy( myMap, myMap + myMapSize, b);
+    		while(b != e)
+    			*b++ = allocateRow();
         	deallocateMap(myMap, myMapSize);
         	myMap = newMap;
         	myMapSize = n;
@@ -267,15 +272,20 @@ class MyDeque {
 
 			private:
                 pointer currentItem;
+                map_pointer currentRow;
                 pointer rowBegin;
                 pointer rowEnd;
-                map_pointer currentRow;
 
 			private:
 
 				bool valid() const {
-					// TODO <your code>
-					return ((currentRow != NULL) && (currentItem != NULL));
+                    // assert(currentRow != NULL);
+                    // assert(currentItem >= rowBegin);
+                    // assert(currentItem < rowEnd);
+					return ((currentRow != NULL)
+                            && (currentItem >= rowBegin)
+                            && (currentItem < rowEnd));
+                    return true;
 				}
 
                 void setRow(map_pointer newRow) {
@@ -290,16 +300,14 @@ class MyDeque {
                  * Does NOT create a valid iterator
                  */
                 iterator() :
-                        currentItem(NULL), rowBegin(NULL), rowEnd(NULL),
-                        currentRow(NULL)
+                        currentItem(NULL), currentRow(NULL), rowBegin(NULL), rowEnd(NULL)
                 {}
 
 				/**
 				 * TODO <your documentation>
 				 */
 				iterator(pointer item, map_pointer row):
-                        currentItem(item), rowBegin(*row),
-                        rowEnd(rowBegin + ROW_SIZE) 
+                        currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) 
                 {}
 
 				/**
@@ -323,7 +331,6 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				iterator& operator ++() {
-					// TODO <your code>
 					*this += 1;
 					assert(valid());
 					return *this;
@@ -343,7 +350,6 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				iterator& operator --() {
-					// TODO <your code>
 					*this += -1;
 					assert(valid());
 					return *this;
@@ -363,27 +369,24 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				iterator& operator +=(difference_type d) {
-					// TODO <your code>
 					assert(valid());
-                    difference_type offset = d + (currentItem - rowBegin);
+                    difference_type newPosition = d + (currentItem - rowBegin);
 
                     // Same row
-                    if (offset >= 0 && offset < ROW_SIZE)
+                    if (newPosition >= 0 && newPosition < ROW_SIZE)
                         currentItem += d;
-
                     else {
-                        // Move to next row
-                        difference_type rowOffset;
-                        if (offset > 0)
-                            rowOffset = offset >> LOG_ROW_SIZE;
-                        // Move to previous row
+                        // Move to lower row
+                        difference_type newRow;
+                        if (newPosition > 0)
+                            newRow = newPosition / ROW_SIZE;
+                        // Move to higher row
                         else {
-                            rowOffset = -difference_type((-offset - 1) >> LOG_ROW_SIZE) - 1;
+                            newRow = -difference_type((-newPosition - 1) / ROW_SIZE) - 1;
                         }
-                        setRow(currentRow + rowOffset);
-                        currentItem = rowBegin + (offset - (rowOffset << LOG_ROW_SIZE));
+                        setRow(currentRow + newRow);
+                        currentItem = rowBegin + (newPosition - newRow * ROW_SIZE);
                     }
-
 					assert(valid());
 					return *this;
 				}
@@ -587,15 +590,16 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		explicit MyDeque(size_type s, const_reference v = value_type(), const allocator_type& a = allocator_type()) :
-				mySize(s),
+				mySize(0),
 				myMapSize(0),
 				myAllocator(a),
 				myMapAllocator(),
 				myMap(NULL) {
-			resizeMap((s >> LOG_ROW_SIZE) + 1);
+			resizeMap((s / ROW_SIZE) + 1);
+            mySize = s;
 			myBegin = iterator(*myMap, myMap);
-			myEnd = myBegin + s;
-			uninitialized_fill(myAllocator, myBegin, myEnd, v);
+            assert(myBegin.valid());
+			myEnd = uninitialized_fill(myAllocator, myBegin, myBegin + s, v);
 			assert(valid());
 		}
 
@@ -603,16 +607,21 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		MyDeque(const MyDeque& that) :
-				mySize(that.mySize),
+				mySize(0),
 				myMapSize(0),
 				myAllocator(that.myAllocator),
 				myMapAllocator(that.myMapAllocator),
 				myMap(NULL) {
 			// TODO <your code>
-			resizeMap((that.mySize >> LOG_ROW_SIZE) + 1);
+            resizeMap((that.mySize / ROW_SIZE) + 1);
+            mySize = that.mySize;
 			myBegin = iterator(*myMap, myMap);
-			myEnd = uninitialized_copy(myAllocator, that.myBegin, that.myEnd, myBegin);
+            // assert(false);
+            // myEnd = uninitialized_copy(myAllocator, that.myBegin, that.myEnd, myBegin);
+            myEnd = myBegin + mySize;
+            // assert(false);
 			assert(valid());
+            // assert(false);
 		}
 
 		/**
@@ -660,8 +669,7 @@ class MyDeque {
 		reference at(size_type index) {
 			// TODO <your code>
 			// dummy is just to be able to compile the skeleton, remove it
-			static value_type dummy;
-			return dummy;
+			return *(myBegin + index);
 		}
 
 		/**

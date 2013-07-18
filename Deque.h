@@ -279,9 +279,6 @@ class MyDeque {
 			private:
 
 				bool valid() const {
-                    // assert(currentRow != NULL);
-                    // assert(currentItem >= rowBegin);
-                    // assert(currentItem < rowEnd);
 					return ((currentRow != NULL)
                             && (currentItem >= rowBegin)
                             && (currentItem < rowEnd));
@@ -299,17 +296,16 @@ class MyDeque {
                  * Creates an empty iterator
                  * Does NOT create a valid iterator
                  */
-                iterator() :
-                        currentItem(NULL), currentRow(NULL), rowBegin(NULL), rowEnd(NULL)
-                {}
+                iterator() : currentItem(NULL), currentRow(NULL), rowBegin(NULL), rowEnd(NULL) {
+                    assert(!valid());
+                }
 
 				/**
 				 * TODO <your documentation>
 				 */
-				iterator(pointer item, map_pointer row):
-                        currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) 
-                {}
-
+				iterator(pointer item, map_pointer row) : currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) {
+                    assert(valid());
+                }
 				/**
 				 * TODO <your documentation>
 				 */
@@ -415,8 +411,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				friend bool operator ==(const const_iterator& lhs, const const_iterator& rhs) {
-					// TODO <your code>
-					return true;
+                    return const_cast<const iterator>(lhs) == const_cast<const iterator>(rhs);
 				}
 
 				/**
@@ -430,9 +425,7 @@ class MyDeque {
                  * TODO <your documentation>
                  */
                 friend bool operator < (const const_iterator& lhs, const const_iterator& rhs) {
-                    // TODO <your code>
-                    // TODO add tests for <
-                    return true;
+                    return const_cast<const iterator>(lhs) < const_cast<const iterator>(rhs);
                 }
 
                 /**
@@ -471,28 +464,31 @@ class MyDeque {
 				}
 
 			private:
-				// TODO <your data>
+                pointer currentItem;
+                map_pointer currentRow;
+                pointer rowBegin;
+                pointer rowEnd;
 
 			private:
 				bool valid() const {
-					// TODO <your code>
-					return true;
+                    return const_cast<iterator*>(this)->valid();
 				}
 
 			public:
 				/**
 				 * TODO <your documentation>
 				 */
-				const_iterator(pointer item, map_pointer row) {
-					// TODO <your code>
-					assert(valid());
-				}
+				const_iterator(pointer item, map_pointer row) :
+                        currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) {
+                    assert(valid());
+                }
 
                 /**
                  * TODO <your documentation>
                  */
-                const_iterator(iterator rhs) {
-                    // TODO <your code>
+                const_iterator(iterator rhs) :
+                        currentItem(rhs.item), currentRow(rhs.row),
+                        rowBegin(*(rhs.row)), rowEnd(rhs.rowBegin + ROW_SIZE) {
                     assert(valid());
                 }
 
@@ -500,10 +496,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				reference operator *() const {
-					// TODO <your code>
-					// dummy is just to be able to compile the skeleton, remove it
-					static value_type dummy;
-					return dummy;
+                    return const_cast<iterator*>(this)->operator*();
 				}
 
 				/**
@@ -517,9 +510,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				const_iterator& operator ++() {
-					// TODO <your code>
-					assert(valid());
-					return *this;
+                    return const_cast<iterator*>(this)->operator++();
 				}
 
 				/**
@@ -536,9 +527,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				const_iterator& operator --() {
-					// TODO <your code>
-					assert(valid());
-					return *this;
+                    return const_cast<iterator*>(this)->operator--();
 				}
 
 				/**
@@ -554,19 +543,15 @@ class MyDeque {
 				/**
 				 * TODO <your documentation>
 				 */
-				const_iterator& operator +=(difference_type) {
-					// TODO <your code>
-					assert(valid());
-					return *this;
+				const_iterator& operator +=(difference_type n) {
+                    return const_cast<iterator*>(this)->operator+=(n);
 				}
 
 				/**
 				 * TODO <your documentation>
 				 */
-				const_iterator& operator -=(difference_type) {
-					// TODO <your code>
-					assert(valid());
-					return *this;
+				const_iterator& operator -=(difference_type n) {
+                    return const_cast<iterator*>(this)->operator-=(n);
 				}
 		};
 

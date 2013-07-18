@@ -212,7 +212,7 @@ class MyDeque {
 				/**
 				 * TODO <your documentation>
 				 */
-				friend bool operator ==(const iterator& lhs, const iterator& rhs) {\
+				friend bool operator ==(const iterator& lhs, const iterator& rhs) {
 					return ((lhs.currentRow == rhs.currentRow) &&
                         (lhs.currentItem == rhs.currentItem));
 				}
@@ -278,12 +278,12 @@ class MyDeque {
 
 			private:
 
-				bool valid() const {
-					return ((currentRow != NULL)
+                bool valid() const {
+                    return ((currentRow != NULL)
                             && (currentItem >= rowBegin)
                             && (currentItem < rowEnd));
                     return true;
-				}
+                }
 
                 void setRow(map_pointer newRow) {
                     currentRow = newRow;
@@ -310,10 +310,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				reference operator *() const {
-					// TODO <your code>
-					// dummy is just to be able to compile the skeleton, remove it
-					static value_type dummy;
-					return dummy;
+					return *currentItem;
 				}
 
 				/**
@@ -411,7 +408,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				friend bool operator ==(const const_iterator& lhs, const const_iterator& rhs) {
-                    return const_cast<const iterator>(lhs) == const_cast<const iterator>(rhs);
+                    return ((lhs.currentRow == rhs.currentRow) && (lhs.currentItem == rhs.currentItem));
 				}
 
 				/**
@@ -425,7 +422,11 @@ class MyDeque {
                  * TODO <your documentation>
                  */
                 friend bool operator < (const const_iterator& lhs, const const_iterator& rhs) {
-                    return const_cast<const iterator>(lhs) < const_cast<const iterator>(rhs);
+                    // Compare rows first
+                    // if they're equal
+                    return (lhs.currentRow == rhs.currentRow) ?
+                            (lhs.currentItem < rhs.currentItem):
+                            (lhs.currentRow < lhs.currentRow);
                 }
 
                 /**
@@ -470,9 +471,18 @@ class MyDeque {
                 pointer rowEnd;
 
 			private:
-				bool valid() const {
-                    return const_cast<iterator*>(this)->valid();
-				}
+                bool valid() const {
+                    return ((currentRow != NULL)
+                            && (currentItem >= rowBegin)
+                            && (currentItem < rowEnd));
+                    return true;
+                }
+
+                void setRow(map_pointer newRow) {
+                    currentRow = newRow;
+                    rowBegin = *newRow;
+                    rowEnd = rowBegin + ROW_SIZE;
+                }
 
 			public:
 				/**
@@ -487,8 +497,8 @@ class MyDeque {
                  * TODO <your documentation>
                  */
                 const_iterator(iterator rhs) :
-                        currentItem(rhs.item), currentRow(rhs.row),
-                        rowBegin(*(rhs.row)), rowEnd(rhs.rowBegin + ROW_SIZE) {
+                        currentItem(rhs.currentItem), currentRow(rhs.currentRow),
+                        rowBegin(rhs.rowBegin), rowEnd(rhs.rowBegin + ROW_SIZE) {
                     assert(valid());
                 }
 
@@ -496,7 +506,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				reference operator *() const {
-                    return const_cast<iterator*>(this)->operator*();
+                    return *currentItem;
 				}
 
 				/**
@@ -510,7 +520,9 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				const_iterator& operator ++() {
-                    return const_cast<iterator*>(this)->operator++();
+                    *this += 1;
+                    assert(valid());
+                    return *this;
 				}
 
 				/**
@@ -527,7 +539,9 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				const_iterator& operator --() {
-                    return const_cast<iterator*>(this)->operator--();
+                    *this += -1;
+                    assert(valid());
+                    return *this;
 				}
 
 				/**
@@ -543,15 +557,36 @@ class MyDeque {
 				/**
 				 * TODO <your documentation>
 				 */
-				const_iterator& operator +=(difference_type n) {
-                    return const_cast<iterator*>(this)->operator+=(n);
+				const_iterator& operator +=(difference_type d) {
+                    assert(valid());
+                    difference_type newPosition = d + (currentItem - rowBegin);
+
+                    // Same row
+                    if (newPosition >= 0 && newPosition < ROW_SIZE)
+                        currentItem += d;
+                    else {
+                        // Move to lower row
+                        difference_type newRow;
+                        if (newPosition > 0)
+                            newRow = newPosition / ROW_SIZE;
+                        // Move to higher row
+                        else {
+                            newRow = -difference_type((-newPosition - 1) / ROW_SIZE) - 1;
+                        }
+                        setRow(currentRow + newRow);
+                        currentItem = rowBegin + (newPosition - newRow * ROW_SIZE);
+                    }
+                    assert(valid());
+                    return *this;
 				}
 
 				/**
 				 * TODO <your documentation>
 				 */
-				const_iterator& operator -=(difference_type n) {
-                    return const_cast<iterator*>(this)->operator-=(n);
+				const_iterator& operator -=(difference_type d) {
+                    *this += -d;
+                    assert(valid());
+                    return *this;
 				}
 		};
 
@@ -597,36 +632,43 @@ class MyDeque {
 				myAllocator(that.myAllocator),
 				myMapAllocator(that.myMapAllocator),
 				myMap(NULL) {
-			// TODO <your code>
-            resizeMap((that.mySize / ROW_SIZE) + 1);
+            resizeMap(that.myMapSize);
             mySize = that.mySize;
-			myBegin = iterator(*myMap, myMap);
-            // assert(false);
-            // myEnd = uninitialized_copy(myAllocator, that.myBegin, that.myEnd, myBegin);
+            myBegin = iterator(*myMap, myMap);
             myEnd = myBegin + mySize;
-            // assert(false);
-			assert(valid());
-            // assert(false);
+            myEnd = uninitialized_copy(myAllocator, that.myBegin, that.myEnd, myBegin);
+            assert(valid());
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		~MyDeque() {
-			destroy(myAllocator, myBegin, myEnd);
+            destroy(myAllocator, myBegin, myEnd);
 
-			for (size_type k = 0; k < myMapSize; ++k)
-				deallocateRow(*(myMap + k));
+            for (size_type k = 0; k < myMapSize; ++k)
+                deallocateRow(*(myMap + k));
 
-			deallocateMap(myMap, myMapSize);
-			assert(valid());
+            deallocateMap(myMap, myMapSize);
+            // assert(false);
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		MyDeque& operator =(const MyDeque& rhs) {
-			// TODO <your code>
+            destroy(myAllocator, myBegin, myEnd);
+
+            for (size_type k = 0; k < myMapSize; ++k)
+                deallocateRow(*(myMap + k));
+
+            deallocateMap(myMap, myMapSize);
+
+            resizeMap((rhs.mySize / ROW_SIZE) + 1);
+            mySize = rhs.mySize;
+            myBegin = iterator(*myMap, myMap);
+            myEnd = uninitialized_copy(myAllocator, rhs.myBegin, rhs.myEnd, myBegin);
+
 			assert(valid());
 			return *this;
 		}
@@ -635,10 +677,9 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		reference operator [](size_type index) {
-			// TODO <your code>
-			// dummy is just to be able to compile the skeleton, remove it
-			static value_type dummy;
-			return dummy;
+            // return *(myBegin + index);
+            static value_type dummy;
+            return dummy;
 		}
 
 		/**
@@ -652,8 +693,6 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		reference at(size_type index) {
-			// TODO <your code>
-			// dummy is just to be able to compile the skeleton, remove it
 			return *(myBegin + index);
 		}
 
@@ -668,10 +707,7 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		reference back() {
-			// TODO <your code>
-			// dummy is just to be able to compile the skeleton, remove it
-			static value_type dummy;
-			return dummy;
+            return *(myEnd - 1);
 		}
 
 		/**
@@ -685,24 +721,27 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		iterator begin() {
-			// TODO <your code>
-			return iterator(/* <your arguments> */);
+            return myBegin;
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		const_iterator begin() const {
-			// TODO <your code>
-
-			return const_iterator(iterator());
+            return myBegin;
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		void clear() {
-			// TODO <your code>
+            destroy(myAllocator, myBegin, myEnd);
+
+            for (size_type k = 0; k < myMapSize; ++k)
+                deallocateRow(*(myMap + k));
+
+            deallocateMap(myMap, myMapSize);
+            resizeMap(1);
 			assert(valid());
 		}
 
@@ -717,16 +756,14 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		iterator end() {
-			// TODO <your code>
-			return iterator(/* <your arguments> */);
+            return myEnd - 1;
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		const_iterator end() const {
-			// TODO <your code>
-			return const_iterator(iterator());
+            return myEnd - 1;
 		}
 
 		/**
@@ -743,10 +780,7 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		reference front() {
-			// TODO <your code>
-			// dummy is just to be able to compile the skeleton, remove it
-			static value_type dummy;
-			return dummy;
+            return *(myEnd - 1);
 		}
 
 		/**

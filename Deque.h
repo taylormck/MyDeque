@@ -86,18 +86,19 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		friend bool operator ==(const MyDeque& lhs, const MyDeque& rhs) {
-			// TODO <your code>
-			// you must use std::equal()
-			return true;
+            if (lhs.size() != rhs.size())
+                return false;
+			return std::equal(lhs.myBegin, lhs.myEnd, rhs.myBegin);
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		friend bool operator <(const MyDeque& lhs, const MyDeque& rhs) {
-			// TODO <your code>
-			// you must use std::lexicographical_compare()
-			return true;
+            if (lhs.size() < rhs.size())
+                return true;
+            return std::lexicographical_compare(lhs.myBegin, lhs.myEnd,
+                                                rhs.myBegin, rhs.myEnd);
 		}
 
     public:
@@ -221,6 +222,11 @@ class MyDeque {
 
 		class iterator {
 			public:
+                typedef std::bidirectional_iterator_tag   iterator_category;
+                typedef typename MyDeque::value_type      value_type;
+                typedef typename MyDeque::difference_type difference_type;
+                typedef typename MyDeque::pointer         pointer;
+                typedef typename MyDeque::reference       reference;
 
 				/**
 				 * TODO <your documentation>
@@ -678,9 +684,9 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		reference operator [](size_type index) {
-            // return *(myBegin + index);
-            static value_type dummy;
-            return dummy;
+            return *(myBegin + index);
+            // static value_type dummy;
+            // return dummy;
 		}
 
 		/**

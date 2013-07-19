@@ -143,25 +143,25 @@ TYPED_TEST(DequeTest, ContentEqualsLarge) {
 
 TYPED_TEST(DequeTest, ContentNotEqual) {
 	this->SetDifferent();
-	// EXPECT_NE(this->x, this->y);
+	ASSERT_NE(this->x, this->y);
 }
 
 TYPED_TEST(DequeTest, SizeNotEqualSize) {
 	this->SetSame();
 	this->x.push_back(0);
-	EXPECT_NE(this->x, this->y);
+	ASSERT_NE(this->x.size(), this->y.size());
 }
 
 TYPED_TEST(DequeTest, ContentAndSizeNotEqual) {
 	this->SetSame();
 	this->x.push_back(0);
-	EXPECT_NE(this->x, this->y);
+	ASSERT_NE(this->x, this->y);
 }
 
 TYPED_TEST(DequeTest, ContentNotEqualsLarge) {
 	this->SetLarge();
 	this->y.at(this->s - 1) = 0;
-	EXPECT_NE(this->x, this->y);
+	ASSERT_NE(this->x, this->y);
 }
 
 // --- operator < ---
@@ -1159,7 +1159,6 @@ TEST_F(MyDequeTest, ResizeMapSmall) {
 
 TEST_F(MyDequeTest, ResizeMapLarge) {
 	x.resizeMap(large);
-
 	EXPECT_EQ(large, x.myMapSize);
 }
 

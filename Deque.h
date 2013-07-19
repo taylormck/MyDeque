@@ -172,17 +172,16 @@ class MyDeque {
         	if (n == myMapSize)
         		return;
 
-        	
         	// Case 2, we are larger than size n
         	if (n < myMapSize) {
+        		map_pointer b = myMap + n;
+                map_pointer e = myMap + myMapSize;
                 // We must destroy any items that will be cut off
-                iterator startDelete = iterator(*(myMap + n), myMap + n);
+                iterator startDelete = iterator(*b, b);
                 startDelete = std::max(startDelete, myBegin);
                 if (startDelete < myEnd)
                     myEnd = destroy(myAllocator, startDelete, myEnd);
 
-        		map_pointer b = myMap + n;
-                map_pointer e = myMap + myMapSize;
                 while (b != e)
                     deallocateRow(*b++);
         	}
@@ -226,8 +225,7 @@ class MyDeque {
 
 	public:
 
-        // I added everything needed to make these into random access iterators
-        // This means constant time +=, so I could use it later
+        // These are constant time +=, so I could use it later
 		class iterator {
 			public:
                 typedef std::bidirectional_iterator_tag   iterator_category;
@@ -252,6 +250,8 @@ class MyDeque {
 
                 /**
                  * TODO <your documentation>
+                 *
+                 * This wasn't required, but I thought I might need it
                  */
                 friend bool operator < (const iterator& lhs, const iterator& rhs) {
                     // Compare rows first
@@ -260,27 +260,6 @@ class MyDeque {
                             (lhs.currentItem < rhs.currentItem):
                             (lhs.currentRow < lhs.currentRow);
                 }
-
-                // /**
-                //  * TODO <your documentation>
-                //  */
-                // friend bool operator <= (const iterator& lhs, const iterator& rhs) {
-                //     return !(rhs < lhs);
-                // }
-
-                // /**
-                //  * TODO <your documentation>
-                //  */
-                // friend bool operator > (const iterator& lhs, const iterator& rhs) {
-                //     return rhs < lhs;
-                // }
-
-                // /**
-                //  * TODO <your documentation>
-                //  */
-                // friend bool operator >= (const iterator& lhs, const iterator& rhs) {
-                //     return !(lhs < rhs);
-                // }
 
 				/**
 				 * TODO <your documentation>
@@ -426,7 +405,7 @@ class MyDeque {
 	public:
 		class const_iterator {
 			public:
-				typedef std::random_access_iterator_tag iterator_category;
+				typedef std::bidirectional_iterator_tag iterator_category;
 				typedef typename MyDeque::value_type value_type;
 				typedef typename MyDeque::difference_type difference_type;
 				typedef typename MyDeque::const_pointer pointer;
@@ -756,6 +735,7 @@ class MyDeque {
 		 */
 		void clear() {
             resizeMap(1);
+            destroy(myAllocator, myBegin, myEnd);
             myBegin = iterator(*myMap + (ROW_SIZE >> 1), myMap);
             myEnd = myBegin;
 			assert(valid());
@@ -796,7 +776,7 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		reference front() {
-            return *(myEnd - 1);
+            return *myBegin;
 		}
 
 		/**
@@ -837,18 +817,24 @@ class MyDeque {
 		/**
 		 * TODO <your documentation>
 		 */
-		void push_back(const_reference) {
+		void push_back(const_reference v) {
+            if(myEnd == totalEnd)
+                growMap();
+            ++myEnd;
+            myAllocator.construct(&*myEnd, v);
 			++mySize;
-			// TODO <your code>
 			assert(valid());
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
-		void push_front(const_reference) {
+		void push_front(const_reference v) {
+            if(myBegin == totalBegin)
+                growMap();
+            --myBegin;
+            myAllocator.construct(&*myBegin, v);
 			++mySize;
-			// TODO <your code>
 			assert(valid());
 		}
 

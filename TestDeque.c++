@@ -365,6 +365,7 @@ TYPED_TEST(DequeTest, FrontWhenSizeIsSmall) {
 TYPED_TEST(DequeTest, FrontWhenSizeIsLarge) {
 	this->SetLarge();
 	ASSERT_EQ(this->s, this->x.size());
+	assert(false);
 	this->x.push_front(9);
 	ASSERT_EQ(9, this->x.front());
 }

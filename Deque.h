@@ -126,6 +126,8 @@ class MyDeque {
 				return false;
 			if (myBegin > myEnd)
 				return false;
+            if (myMapSize < 1)
+                return false;
 
 			return true;
 		}
@@ -162,6 +164,7 @@ class MyDeque {
          * TODO <your documentation>
          */
         void resizeMap(size_type n) {
+            assert(n >= 0);
         	// Case 1, we are already size n
         	if (n == myMapSize)
         		return;
@@ -169,7 +172,10 @@ class MyDeque {
         	
         	// Case 2, we are larger than size n
         	if (n < myMapSize) {
-                // TODO memory leak, need to deallocate rows
+                iterator startDelete = iterator(*(myMap + n), myMap + n);
+                startDelete = std::max(startDelete, myBegin);
+                myEnd = destroy(myAllocator, startDelete, myEnd);
+
         		map_pointer b = myMap + n;
                 map_pointer e = myMap + myMapSize;
                 while (b != e)
@@ -202,6 +208,13 @@ class MyDeque {
          */
         void growMap() {
         	resizeMap(3 * std::max(static_cast<size_type>(1), myMapSize));
+        }
+
+        /**
+         * TODO <your documentation>
+         */
+        void clearMap() {
+            resizeMap(0);
         }
 
 	public:
@@ -644,27 +657,15 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		~MyDeque() {
-            destroy(myAllocator, myBegin, myEnd);
-
-            for (size_type k = 0; k < myMapSize; ++k)
-                deallocateRow(*(myMap + k));
-
-            deallocateMap(myMap, myMapSize);
-            // assert(false);
+            clearMap();
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		MyDeque& operator =(const MyDeque& rhs) {
-            destroy(myAllocator, myBegin, myEnd);
-
-            for (size_type k = 0; k < myMapSize; ++k)
-                deallocateRow(*(myMap + k));
-
-            deallocateMap(myMap, myMapSize);
-
-            resizeMap((rhs.mySize / ROW_SIZE) + 1);
+            clearMap();
+            resizeMap(rhs.myMapSize);
             mySize = rhs.mySize;
             myBegin = iterator(*myMap, myMap);
             myEnd = uninitialized_copy(myAllocator, rhs.myBegin, rhs.myEnd, myBegin);
@@ -728,20 +729,16 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		const_iterator begin() const {
-            return myBegin;
+            return begin();
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		void clear() {
-            destroy(myAllocator, myBegin, myEnd);
-
-            for (size_type k = 0; k < myMapSize; ++k)
-                deallocateRow(*(myMap + k));
-
-            deallocateMap(myMap, myMapSize);
             resizeMap(1);
+            myBegin = iterator(*myMap + (ROW_SIZE >> 1), myMap);
+            myEnd = myBegin;
 			assert(valid());
 		}
 
@@ -756,14 +753,14 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		iterator end() {
-            return myEnd - 1;
+            return myEnd;
 		}
 
 		/**
 		 * TODO <your documentation>
 		 */
 		const_iterator end() const {
-            return myEnd - 1;
+            return end();
 		}
 
 		/**

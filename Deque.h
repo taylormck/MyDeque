@@ -119,10 +119,12 @@ class MyDeque {
         iterator myBegin;
         iterator myEnd;
 
+        iterator totalBegin;
+        iterator totalEnd;
+
 	private:
 
 		bool valid() const {
-			// TODO <your code>
 			if (myMap == NULL)
 				return false;
 			if (myBegin > myEnd)
@@ -173,9 +175,11 @@ class MyDeque {
         	
         	// Case 2, we are larger than size n
         	if (n < myMapSize) {
+                // We must destroy any items that will be cut off
                 iterator startDelete = iterator(*(myMap + n), myMap + n);
                 startDelete = std::max(startDelete, myBegin);
-                myEnd = destroy(myAllocator, startDelete, myEnd);
+                if (startDelete < myEnd)
+                    myEnd = destroy(myAllocator, startDelete, myEnd);
 
         		map_pointer b = myMap + n;
                 map_pointer e = myMap + myMapSize;
@@ -190,18 +194,18 @@ class MyDeque {
 
             const map_pointer newMap = allocateMap(n);
 
-    		map_pointer b = newMap;
-    		map_pointer firstStop = b + ((n - myMapSize) >> 1);
-    		map_pointer e = newMap + n;
+            map_pointer b = newMap;
+            map_pointer firstStop = b + ((n - myMapSize) >> 1);
+            map_pointer e = newMap + n;
 
-    		while(b != firstStop)
-    			*b++ = allocateRow();
-    		b = std::copy( myMap, myMap + myMapSize, b);
-    		while(b != e)
-    			*b++ = allocateRow();
-        	deallocateMap(myMap, myMapSize);
-        	myMap = newMap;
-        	myMapSize = n;
+            while(b != firstStop)
+                *b++ = allocateRow();
+            b = std::copy( myMap, myMap + myMapSize, b);
+            while(b != e)
+                *b++ = allocateRow();
+            deallocateMap(myMap, myMapSize);
+            myMap = newMap;
+            myMapSize = n;
         }
 
         /**

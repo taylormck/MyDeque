@@ -185,27 +185,29 @@ class MyDeque {
                 map_pointer e = myMap + myMapSize;
                 while (b != e)
                     deallocateRow(*b++);
-                myMapSize = n;
-                return;
         	}
+            else {
+            	// Case 3, n is larger than us
+        		assert(n > myMapSize);
 
-        	// Case 3, n is larger than us
-    		assert(n > myMapSize);
+                const map_pointer newMap = allocateMap(n);
 
-            const map_pointer newMap = allocateMap(n);
+                map_pointer b = newMap;
+                map_pointer firstStop = b + ((n - myMapSize) >> 1);
+                map_pointer e = newMap + n;
 
-            map_pointer b = newMap;
-            map_pointer firstStop = b + ((n - myMapSize) >> 1);
-            map_pointer e = newMap + n;
-
-            while(b != firstStop)
-                *b++ = allocateRow();
-            b = std::copy( myMap, myMap + myMapSize, b);
-            while(b != e)
-                *b++ = allocateRow();
-            deallocateMap(myMap, myMapSize);
-            myMap = newMap;
+                while(b != firstStop)
+                    *b++ = allocateRow();
+                b = std::copy( myMap, myMap + myMapSize, b);
+                while(b != e)
+                    *b++ = allocateRow();
+                deallocateMap(myMap, myMapSize);
+                myMap = newMap;
+            }
+            
             myMapSize = n;
+            totalBegin = iterator(*myMap, myMap);
+            totalEnd = totalBegin + (n * ROW_SIZE);
         }
 
         /**
@@ -224,6 +226,8 @@ class MyDeque {
 
 	public:
 
+        // I added everything needed to make these into random access iterators
+        // This means constant time +=, so I could use it later
 		class iterator {
 			public:
                 typedef std::bidirectional_iterator_tag   iterator_category;
@@ -236,8 +240,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				friend bool operator ==(const iterator& lhs, const iterator& rhs) {
-					return ((lhs.currentRow == rhs.currentRow) &&
-                        (lhs.currentItem == rhs.currentItem));
+					return (lhs.currentItem == rhs.currentItem);
 				}
 
 				/**
@@ -252,32 +255,32 @@ class MyDeque {
                  */
                 friend bool operator < (const iterator& lhs, const iterator& rhs) {
                     // Compare rows first
-                    // if they're equal
+                    // if they're equal, compare items
                     return (lhs.currentRow == rhs.currentRow) ?
                             (lhs.currentItem < rhs.currentItem):
                             (lhs.currentRow < lhs.currentRow);
                 }
 
-                /**
-                 * TODO <your documentation>
-                 */
-                friend bool operator <= (const iterator& lhs, const iterator& rhs) {
-                    return !(rhs < lhs);
-                }
+                // /**
+                //  * TODO <your documentation>
+                //  */
+                // friend bool operator <= (const iterator& lhs, const iterator& rhs) {
+                //     return !(rhs < lhs);
+                // }
 
-                /**
-                 * TODO <your documentation>
-                 */
-                friend bool operator > (const iterator& lhs, const iterator& rhs) {
-                    return rhs < lhs;
-                }
+                // /**
+                //  * TODO <your documentation>
+                //  */
+                // friend bool operator > (const iterator& lhs, const iterator& rhs) {
+                //     return rhs < lhs;
+                // }
 
-                /**
-                 * TODO <your documentation>
-                 */
-                friend bool operator >= (const iterator& lhs, const iterator& rhs) {
-                    return !(lhs < rhs);
-                }
+                // /**
+                //  * TODO <your documentation>
+                //  */
+                // friend bool operator >= (const iterator& lhs, const iterator& rhs) {
+                //     return !(lhs < rhs);
+                // }
 
 				/**
 				 * TODO <your documentation>
@@ -302,9 +305,12 @@ class MyDeque {
 			private:
 
                 bool valid() const {
-                    return ((currentRow != NULL)
-                            && (currentItem >= rowBegin)
-                            && (currentItem < rowEnd));
+                    if (currentRow == NULL)
+                        return false;
+                    if (currentItem < rowBegin)
+                        return false;
+                    if (currentItem >= rowEnd)
+                        return false;
                     return true;
                 }
 
@@ -431,7 +437,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				friend bool operator ==(const const_iterator& lhs, const const_iterator& rhs) {
-                    return ((lhs.currentRow == rhs.currentRow) && (lhs.currentItem == rhs.currentItem));
+                    return (lhs.currentItem == rhs.currentItem);
 				}
 
 				/**
@@ -446,32 +452,32 @@ class MyDeque {
                  */
                 friend bool operator < (const const_iterator& lhs, const const_iterator& rhs) {
                     // Compare rows first
-                    // if they're equal
+                    // if they're equal, compare items
                     return (lhs.currentRow == rhs.currentRow) ?
                             (lhs.currentItem < rhs.currentItem):
                             (lhs.currentRow < lhs.currentRow);
                 }
 
-                /**
-                 * TODO <your documentation>
-                 */
-                friend bool operator <= (const const_iterator& lhs, const const_iterator& rhs) {
-                    return !(rhs < lhs);
-                }
+                // /**
+                //  * TODO <your documentation>
+                //  */
+                // friend bool operator <= (const const_iterator& lhs, const const_iterator& rhs) {
+                //     return !(rhs < lhs);
+                // }
 
-                /**
-                 * TODO <your documentation>
-                 */
-                friend bool operator > (const const_iterator& lhs, const const_iterator& rhs) {
-                    return rhs < lhs;
-                }
+                // /**
+                //  * TODO <your documentation>
+                //  */
+                // friend bool operator > (const const_iterator& lhs, const const_iterator& rhs) {
+                //     return rhs < lhs;
+                // }
 
-                /**
-                 * TODO <your documentation>
-                 */
-                friend bool operator >= (const const_iterator& lhs, const const_iterator& rhs) {
-                    return !(lhs < rhs);
-                }
+                // /**
+                //  * TODO <your documentation>
+                //  */
+                // friend bool operator >= (const const_iterator& lhs, const const_iterator& rhs) {
+                //     return !(lhs < rhs);
+                // }
 
 				/**
 				 * TODO <your documentation>
@@ -495,9 +501,12 @@ class MyDeque {
 
 			private:
                 bool valid() const {
-                    return ((currentRow != NULL)
-                            && (currentItem >= rowBegin)
-                            && (currentItem < rowEnd));
+                    if (currentRow == NULL)
+                        return false;
+                    if (currentItem < rowBegin)
+                        return false;
+                    if (currentItem >= rowEnd)
+                        return false;
                     return true;
                 }
 

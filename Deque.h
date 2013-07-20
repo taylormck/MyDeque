@@ -83,7 +83,7 @@ class MyDeque {
 
 	public:
 		/**
-		 * TODO <your documentation>
+		 * Compares the deques for equality
 		 */
 		friend bool operator ==(const MyDeque& lhs, const MyDeque& rhs) {
             if (lhs.size() != rhs.size())
@@ -92,7 +92,7 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns true if lhs is lexicographically less than rhs
 		 */
 		friend bool operator <(const MyDeque& lhs, const MyDeque& rhs) {
             if (lhs.size() < rhs.size())
@@ -136,35 +136,36 @@ class MyDeque {
 		}
 
         /**
-         * TODO <your documentation>
+         * Helper function to allocate one row
          */
         pointer allocateRow() {
             return myAllocator.allocate(ROW_SIZE);
         }
 
         /**
-         * TODO <your documentation>
+         * Helper function to deallocate one row
          */
         void deallocateRow(pointer row) {
         	myAllocator.deallocate(row, ROW_SIZE);
         }
 
         /**
-         * TODO <your documentation>
+         * Helper function to allocate a map
          */
         map_pointer allocateMap(size_type n) {
             return myMapAllocator.allocate(n);
         }
 
         /**
-         * TODO <your documentation>
+         * Helper function to deallocate a map
          */
         void deallocateMap(map_pointer map, size_type n) {
             myMapAllocator.deallocate(map, n);
         }
 
         /**
-         * TODO <your documentation>
+         * Helper function to shrink the deque
+         * Will leave leading values, cuts trailing values
          */
         void resizeMapSmaller(size_type n, map_pointer newMap) {
         	assert(n < myMapSize);
@@ -203,7 +204,8 @@ class MyDeque {
         }
 
         /**
-         * TODO <your documentation>
+         * Allocates more space for this deque
+         * Attempts to place existing data in the middle
          */
         void resizeMapLarger(size_type n, map_pointer newMap) {
         	assert(n > myMapSize);
@@ -223,7 +225,8 @@ class MyDeque {
         }
 
         /**
-         * TODO <your documentation>
+         * Helper function to resize the map, allocating/deallocating
+         * more rows as necessary
          */
         void resizeMap(size_type n) {
             assert(n >= 0);
@@ -250,14 +253,14 @@ class MyDeque {
         }
 
         /**
-         * TODO <your documentation>
+         * Triples the size of the map
          */
         void growMap() {
         	resizeMap(3 * std::max(static_cast<size_type>(1), myMapSize));
         }
 
         /**
-         * TODO <your documentation>
+         * Deletes the map and all the data
          */
         void clearMap() {
             resizeMap(0);
@@ -275,21 +278,21 @@ class MyDeque {
                 typedef typename MyDeque::reference       reference;
 
 				/**
-				 * TODO <your documentation>
+				 * Compares the iterators for equality
 				 */
 				friend bool operator ==(const iterator& lhs, const iterator& rhs) {
 					return (lhs.currentItem == rhs.currentItem);
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Copmares the iterators for inequality
 				 */
 				friend bool operator !=(const iterator& lhs, const iterator& rhs) {
 					return !(lhs == rhs);
 				}
 
                 /**
-                 * TODO <your documentation>
+                 * Returns true if lhs is before rhs
                  *
                  * This wasn't required, but I thought I might need it
                  */
@@ -302,14 +305,14 @@ class MyDeque {
                 }
 
 				/**
-				 * TODO <your documentation>
+				 * Move the iterator rhs steps forward
 				 */
 				friend iterator operator +(iterator lhs, difference_type rhs) {
 					return lhs += rhs;
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move the iterator rhs steps back
 				 */
 				friend iterator operator -(iterator lhs, difference_type rhs) {
 					return lhs -= rhs;
@@ -349,27 +352,27 @@ class MyDeque {
                 }
 
 				/**
-				 * TODO <your documentation>
+				 * Creates a new iterator using a pointer to the object and the row
 				 */
 				iterator(pointer item, map_pointer row) : currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) {
                     assert(valid());
                 }
 				/**
-				 * TODO <your documentation>
+				 * Return the object this iterator points to
 				 */
 				reference operator *() const {
 					return *currentItem;
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Call methods from the object this iterator points to
 				 */
 				pointer operator ->() const {
 					return &**this;
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator forward by 1
 				 */
 				iterator& operator ++() {
 					*this += 1;
@@ -378,7 +381,8 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator forward by 1,
+				 * returns the old value
 				 */
 				iterator operator ++(int) {
 					iterator x = *this;
@@ -388,7 +392,7 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator back by 1
 				 */
 				iterator& operator --() {
 					*this -= 1;
@@ -397,7 +401,8 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator back by 1,
+				 * returns the old value
 				 */
 				iterator operator --(int) {
 					iterator x = *this;
@@ -407,7 +412,7 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move the iterator forward by d steps
 				 */
 				iterator& operator +=(difference_type d) {
 					assert(valid());
@@ -445,7 +450,7 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move the iterator back by d steps
 				 */
 				iterator& operator -=(difference_type d) {
 					*this += -d;
@@ -465,21 +470,21 @@ class MyDeque {
 
 			public:
 				/**
-				 * TODO <your documentation>
+				 * Compare the iterators for equality
 				 */
 				friend bool operator ==(const const_iterator& lhs, const const_iterator& rhs) {
                     return (lhs.currentItem == rhs.currentItem);
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Compare the iterators for inequality
 				 */
 				friend bool operator !=(const const_iterator& lhs, const const_iterator& rhs) {
 					return !(lhs == rhs);
 				}
 
                 /**
-                 * TODO <your documentation>
+                 * Returns true if lhs is before rhs
                  */
                 friend bool operator < (const const_iterator& lhs, const const_iterator& rhs) {
                     // Compare rows first
@@ -489,36 +494,15 @@ class MyDeque {
                             (lhs.currentRow < lhs.currentRow);
                 }
 
-                // /**
-                //  * TODO <your documentation>
-                //  */
-                // friend bool operator <= (const const_iterator& lhs, const const_iterator& rhs) {
-                //     return !(rhs < lhs);
-                // }
-
-                // /**
-                //  * TODO <your documentation>
-                //  */
-                // friend bool operator > (const const_iterator& lhs, const const_iterator& rhs) {
-                //     return rhs < lhs;
-                // }
-
-                // /**
-                //  * TODO <your documentation>
-                //  */
-                // friend bool operator >= (const const_iterator& lhs, const const_iterator& rhs) {
-                //     return !(lhs < rhs);
-                // }
-
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator forward by rhs steps
 				 */
 				friend const_iterator operator +(const_iterator lhs, difference_type rhs) {
 					return lhs += rhs;
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator back by rhs steps
 				 */
 				friend const_iterator operator -(const_iterator lhs, difference_type rhs) {
 					return lhs -= rhs;
@@ -549,7 +533,8 @@ class MyDeque {
 
 			public:
 				/**
-				 * TODO <your documentation>
+				 * Create a new const_iterator using a pointer to the data type
+				 * and its row
 				 */
 				const_iterator(pointer item, map_pointer row) :
                         currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) {
@@ -557,7 +542,7 @@ class MyDeque {
                 }
 
                 /**
-                 * TODO <your documentation>
+                 * Create a const_iterator using an iterator
                  */
                 const_iterator(iterator rhs) :
                         currentItem(rhs.currentItem), currentRow(rhs.currentRow),
@@ -566,21 +551,21 @@ class MyDeque {
                 }
 
 				/**
-				 * TODO <your documentation>
+				 * Return the object this iterator points to
 				 */
 				reference operator *() const {
                     return *currentItem;
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Call methods from the object this iterator points to
 				 */
 				pointer operator ->() const {
 					return &**this;
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator forward by 1
 				 */
 				const_iterator& operator ++() {
                     *this += 1;
@@ -589,7 +574,8 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator forward by 1,
+				 * returns the old value
 				 */
 				const_iterator operator ++(int) {
 					const_iterator x = *this;
@@ -599,7 +585,7 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator back by 1
 				 */
 				const_iterator& operator --() {
                     *this += -1;
@@ -608,7 +594,8 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator back by 1,
+				 * returns the old value
 				 */
 				const_iterator operator --(int) {
 					const_iterator x = *this;
@@ -618,7 +605,7 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator forward by d steps
 				 */
 				const_iterator& operator +=(difference_type d) {
                     assert(valid());
@@ -630,12 +617,9 @@ class MyDeque {
                     else {
                         // Move to lower row
                         difference_type newRow;
-                        if (newPosition > 0)
-                            newRow = newPosition / ROW_SIZE;
-                        // Move to higher row
-                        else {
-                            newRow = -difference_type((-newPosition - 1) / ROW_SIZE) - 1;
-                        }
+                        difference_type newRow = newPosition > 0 ?
+                            newPosition / ROW_SIZE :
+                            -((-newPosition - 1) / ROW_SIZE) - 1;
                         setRow(currentRow + newRow);
                         currentItem = rowBegin + (newPosition - newRow * ROW_SIZE);
                     }
@@ -644,7 +628,7 @@ class MyDeque {
 				}
 
 				/**
-				 * TODO <your documentation>
+				 * Move this iterator back by d steps
 				 */
 				const_iterator& operator -=(difference_type d) {
                     *this += -d;
@@ -655,7 +639,8 @@ class MyDeque {
 
 	public:
 		/**
-		 * TODO <your documentation>
+		 * Create an empty MyDeque,
+		 * has a minimum 1 row
 		 */
 		explicit MyDeque(const allocator_type& a = allocator_type()) :
 				mySize(0),
@@ -670,7 +655,8 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Create a MyDeque of the specified size and fill with the specified
+		 * values. Minimum one row
 		 */
 		explicit MyDeque(size_type s, const_reference v = value_type(), const allocator_type& a = allocator_type()) :
 				mySize(0),
@@ -686,7 +672,7 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Copy construct this MyDeque using another
 		 */
 		MyDeque(const MyDeque& that) :
 				mySize(0),
@@ -703,14 +689,14 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Erase all data from the deque, releasing the memory
 		 */
 		~MyDeque() {
             clearMap();
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Set this MyDeque equal to another
 		 */
 		MyDeque& operator =(const MyDeque& rhs) {
             clearMap();
@@ -724,65 +710,63 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Index this MyDeque, return the indexth element
 		 */
 		reference operator [](size_type index) {
             return *(myBegin + index);
-            // static value_type dummy;
-            // return dummy;
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Index this MyDeque, return the indexth element
 		 */
 		const_reference operator [](size_type index) const {
 			return const_cast<MyDeque*>(this)->operator[](index);
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Gets the indexth element from the MyDeque
 		 */
 		reference at(size_type index) {
 			return *(myBegin + index);
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Gets the indexth element from the MyDeque
 		 */
 		const_reference at(size_type index) const {
 			return const_cast<MyDeque*>(this)->at(index);
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns the last element in the MyDeque
 		 */
 		reference back() {
             return *(myEnd - 1);
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns the last element in the MyDeque
 		 */
 		const_reference back() const {
 			return const_cast<MyDeque*>(this)->back();
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns the first element in the MyDeque
 		 */
 		iterator begin() {
             return myBegin;
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns the first element in the MyDeque
 		 */
 		const_iterator begin() const {
             return begin();
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Delete all data from the MyDeque
 		 */
 		void clear() {
             resizeMap(1);
@@ -793,30 +777,31 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns true if this MyDeque is empty,
+		 * false otherwise
 		 */
 		bool empty() const {
 			return !size();
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns an iterator to the space after the last element
 		 */
 		iterator end() {
             return myEnd;
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns an iterator to the space after the last element
 		 */
 		const_iterator end() const {
             return end();
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Remove the element pointed to by i
 		 */
-		iterator erase(iterator) {
+		iterator erase(iterator i) {
 			--mySize;
 			// TODO <your code>
 			assert(valid());
@@ -824,21 +809,21 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns the first element in this Deque
 		 */
 		reference front() {
             return *myBegin;
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Returns the first element in this Deque
 		 */
 		const_reference front() const {
 			return const_cast<MyDeque*>(this)->front();
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Insert an element into this iterator
 		 */
 		iterator insert(iterator, const_reference) {
 			++mySize;
@@ -848,7 +833,7 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Remove the last element in this MyDeque
 		 */
 		void pop_back() {
 			--mySize;
@@ -857,7 +842,7 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Remove the first element in this MyDeque
 		 */
 		void pop_front() {
 			--mySize;
@@ -866,7 +851,7 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Append an element the end of this MyDeque
 		 */
 		void push_back(const_reference v) {
             if(myEnd == totalEnd)
@@ -878,7 +863,7 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Append an element to the front of this MyDeque
 		 */
 		void push_front(const_reference v) {
 			std::cout << "totalBegin:       " << &*totalBegin << std::endl
@@ -897,7 +882,11 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Resize this MyDeque
+		 * If s is larger than the current size, all new objects will
+		 * be set equal to v.
+		 * If s is smaller than the current size, then all trailing objects
+		 * will be removed
 		 */
 		void resize(size_type s, const_reference v = value_type()) {
 			// TODO <your code>
@@ -906,16 +895,16 @@ class MyDeque {
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Return the size of this MyDeque
 		 */
 		size_type size() const {
 			return mySize;
 		}
 
 		/**
-		 * TODO <your documentation>
+		 * Swap the contents of this deque and another
 		 */
-		void swap(MyDeque&) {
+		void swap(MyDeque& other) {
 			// TODO <your code>
 			assert(valid());
 		}

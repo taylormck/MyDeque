@@ -166,44 +166,75 @@ class MyDeque {
         /**
          * TODO <your documentation>
          */
+        void resizeMapSmaller(size_type n, map_pointer newMap) {
+        	assert(n < myMapSize);
+
+            // Trim off the empty space at the beginning
+            map_pointer firstFilledRow = myBegin.currentRow;
+            map_pointer b = myMap;
+            map_pointer e = b + n;
+            while(b != firstFilledRow)
+            	deallocateRow(*b++);
+
+            // Copy the rows into the new map
+            map_pointer endCopy = std::copy(b, e, newMap);
+
+            // Destroy the objects that won't fit
+            iterator beginDestroy = iterator(*e, e);
+            if (beginDestroy < myEnd) {
+            	destroy (myAllocator, beginDestroy, myEnd);
+            }
+
+            // Remove trailing empty rows
+            map_pointer endMap = myMap + myMapSize;
+            while (e < endMap)
+            	deallocateRow(*e++);
+
+            // Destroy old map
+            deallocateMap(myMap, myMapSize);
+
+            // Fill in trailing empty rows
+            map_pointer endNewMap = newMap + n;
+            while (endCopy < endNewMap)
+            	*endCopy++ = allocateRow();
+        }
+
+        /**
+         * TODO <your documentation>
+         */
+        void resizeMapLarger(size_type n, map_pointer newMap) {
+        	assert(n > myMapSize);
+
+            map_pointer b = newMap;
+            map_pointer firstStop = b + ((n - myMapSize) >> 1);
+            map_pointer e = newMap + n;
+
+            while(b != firstStop)
+                *b++ = allocateRow();
+            b = std::copy( myMap, myMap + myMapSize, b);
+            while(b != e)
+                *b++ = allocateRow();
+            deallocateMap(myMap, myMapSize);
+        }
+
+        /**
+         * TODO <your documentation>
+         */
         void resizeMap(size_type n) {
             assert(n >= 0);
         	// Case 1, we are already size n
         	if (n == myMapSize)
         		return;
 
+            const map_pointer newMap = allocateMap(n);
+
         	// Case 2, we are larger than size n
-        	if (n < myMapSize) {
-        		map_pointer b = myMap + n;
-                map_pointer e = myMap + myMapSize;
-                // We must destroy any items that will be cut off
-                iterator startDelete = iterator(*b, b);
-                startDelete = std::max(startDelete, myBegin);
-                if (startDelete < myEnd)
-                    myEnd = destroy(myAllocator, startDelete, myEnd);
-
-                while (b != e)
-                    deallocateRow(*b++);
-        	}
-            else {
-            	// Case 3, n is larger than us
-        		assert(n > myMapSize);
-
-                const map_pointer newMap = allocateMap(n);
-
-                map_pointer b = newMap;
-                map_pointer firstStop = b + ((n - myMapSize) >> 1);
-                map_pointer e = newMap + n;
-
-                while(b != firstStop)
-                    *b++ = allocateRow();
-                b = std::copy( myMap, myMap + myMapSize, b);
-                while(b != e)
-                    *b++ = allocateRow();
-                deallocateMap(myMap, myMapSize);
-                myMap = newMap;
-            }
+        	if (n < myMapSize)
+        		resizeMapSmaller(n, newMap);
+            else
+            	resizeMapLarger(n, newMap);
             
+            myMap = newMap;
             myMapSize = n;
             totalBegin = iterator(*myMap, myMap);
             totalEnd = totalBegin + (n * ROW_SIZE);

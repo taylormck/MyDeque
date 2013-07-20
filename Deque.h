@@ -172,7 +172,7 @@ class MyDeque {
             // Trim off the empty space at the beginning
             map_pointer firstFilledRow = myBegin.currentRow;
             map_pointer b = myMap;
-            map_pointer e = b + n;
+            map_pointer e = myMap + n;
             while(b != firstFilledRow)
             	deallocateRow(*b++);
 
@@ -182,7 +182,7 @@ class MyDeque {
             // Destroy the objects that won't fit
             iterator beginDestroy = iterator(*e, e);
             if (beginDestroy < myEnd) {
-            	destroy (myAllocator, beginDestroy, myEnd);
+            	myEnd = destroy (myAllocator, beginDestroy, myEnd);
             }
 
             // Remove trailing empty rows
@@ -190,13 +190,16 @@ class MyDeque {
             while (e < endMap)
             	deallocateRow(*e++);
 
-            // Destroy old map
-            deallocateMap(myMap, myMapSize);
-
             // Fill in trailing empty rows
             map_pointer endNewMap = newMap + n;
             while (endCopy < endNewMap)
             	*endCopy++ = allocateRow();
+
+            // Fix begin and end iterators
+            myBegin.setRow(newMap);
+            assert(myBegin.valid());    
+        	myEnd.setRow(newMap + n);
+            assert(myEnd.valid());
         }
 
         /**
@@ -204,17 +207,19 @@ class MyDeque {
          */
         void resizeMapLarger(size_type n, map_pointer newMap) {
         	assert(n > myMapSize);
-
             map_pointer b = newMap;
-            map_pointer firstStop = b + ((n - myMapSize) >> 1);
+            map_pointer firstStop = newMap + ((n - myMapSize) / 2);
             map_pointer e = newMap + n;
 
             while(b != firstStop)
                 *b++ = allocateRow();
-            b = std::copy( myMap, myMap + myMapSize, b);
+            b = std::copy(myMap, myMap + myMapSize, b);
+            myBegin.setRow(b);
+            myEnd.setRow(b - 1);
+            assert(myBegin.valid());
+            assert(myEnd.valid());
             while(b != e)
                 *b++ = allocateRow();
-            deallocateMap(myMap, myMapSize);
         }
 
         /**
@@ -226,6 +231,7 @@ class MyDeque {
         	if (n == myMapSize)
         		return;
 
+        	// Build new map
             const map_pointer newMap = allocateMap(n);
 
         	// Case 2, we are larger than size n
@@ -234,10 +240,13 @@ class MyDeque {
             else
             	resizeMapLarger(n, newMap);
             
+            // Destroy old map
+            deallocateMap(myMap, myMapSize);
+
             myMap = newMap;
             myMapSize = n;
             totalBegin = iterator(*myMap, myMap);
-            totalEnd = totalBegin + (n * ROW_SIZE);
+            totalEnd = iterator(*(myMap + n), myMap + n);
         }
 
         /**
@@ -382,7 +391,7 @@ class MyDeque {
 				 * TODO <your documentation>
 				 */
 				iterator& operator --() {
-					*this += -1;
+					*this -= 1;
 					assert(valid());
 					return *this;
 				}
@@ -402,22 +411,34 @@ class MyDeque {
 				 */
 				iterator& operator +=(difference_type d) {
 					assert(valid());
+
                     difference_type newPosition = d + (currentItem - rowBegin);
 
                     // Same row
                     if (newPosition >= 0 && newPosition < ROW_SIZE)
                         currentItem += d;
                     else {
-                        // Move to lower row
-                        difference_type newRow;
-                        if (newPosition > 0)
-                            newRow = newPosition / ROW_SIZE;
-                        // Move to higher row
-                        else {
-                            newRow = -difference_type((-newPosition - 1) / ROW_SIZE) - 1;
-                        }
+                        // Set the offset to the new row
+                        // If 
+                        difference_type newRow = newPosition > 0 ?
+                            newPosition / ROW_SIZE :
+                            -((-newPosition - 1) / ROW_SIZE) - 1;
+
+                       	difference_type offset = newPosition - newRow * ROW_SIZE;
+                        std::cout << "d                 " << d << std::endl
+                        		  << "old Row:          " << currentRow << std::endl
+                        		  << "old Item:         " << currentItem << std::endl
+                        		  << "old rowBegin:     " << rowBegin << std::endl
+                        		  << "old rowEnd:       " << rowEnd << std::endl
+                        		  << "position offset   " << offset << std::endl;
+
                         setRow(currentRow + newRow);
-                        currentItem = rowBegin + (newPosition - newRow * ROW_SIZE);
+                        currentItem = rowBegin + offset;
+                        std::cout << "row offset:       " << newRow << std::endl
+                                  << "new currentRow    " << currentRow << std::endl
+                                  << "new currentItem:  " << currentItem << std::endl
+                                  << "new rowBegin:     " << rowBegin << std::endl
+                                  << "new rowEnd:       " << rowEnd <<std::endl;
                     }
 					assert(valid());
 					return *this;
@@ -660,7 +681,6 @@ class MyDeque {
 			resizeMap((s / ROW_SIZE) + 1);
             mySize = s;
 			myBegin = iterator(*myMap, myMap);
-            assert(myBegin.valid());
 			myEnd = uninitialized_fill(myAllocator, myBegin, myBegin + s, v);
 			assert(valid());
 		}
@@ -851,8 +871,8 @@ class MyDeque {
 		void push_back(const_reference v) {
             if(myEnd == totalEnd)
                 growMap();
-            ++myEnd;
             myAllocator.construct(&*myEnd, v);
+            ++myEnd;
 			++mySize;
 			assert(valid());
 		}
@@ -861,10 +881,17 @@ class MyDeque {
 		 * TODO <your documentation>
 		 */
 		void push_front(const_reference v) {
+			std::cout << "totalBegin:       " << &*totalBegin << std::endl
+					  << "myBegin:          " << &*myBegin << std::endl;
             if(myBegin == totalBegin)
                 growMap();
             --myBegin;
+            std::cout << "new totalBegin:   " << &*totalBegin << std::endl
+            		  << "new myBegin:      " << &*myBegin << std::endl
+            		  << std::endl;
+            assert(myBegin >= totalBegin);
             myAllocator.construct(&*myBegin, v);
+			// assert(false);
 			++mySize;
 			assert(valid());
 		}

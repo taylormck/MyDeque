@@ -833,18 +833,18 @@ class MyDeque {
 		iterator erase(iterator i) {
 			if (i == myBegin) {
 				pop_front();
-				--mySize;
+				return myBegin;
 			}
-			if (i == myEnd) {
+			else if (i == myEnd) {
 				pop_back();
-				--mySize;
+				return myEnd;
 			}
 			iterator j = i + 1;
 			*i = *j;
 			erase(j);
-			// TODO <your code>
 			assert(valid());
-			return iterator();
+			return i;
+			// TODO <your code>
 		}
 
 		/**

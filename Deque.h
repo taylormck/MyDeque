@@ -250,20 +250,8 @@ class MyDeque {
             // Fix iterators
             difference_type beginOffset = myBegin.currentRow - totalBegin.currentRow;
             difference_type endOffset = myEnd.currentRow - totalBegin.currentRow;
-        	// std::cout << std::endl 
-        	// 		  << "==================================" << std::endl
-        	// 		  << "|| currentRow:  " << myBegin.currentRow << std::endl
-        	// 		  << "|| currentItem: " << myBegin.currentItem << std::endl
-        	// 		  << "|| rowBegin:    " << myBegin.rowBegin << std::endl
-        	// 		  << "|| rowEnd:      " << myBegin.rowEnd << std::endl;
 		    myBegin.setRow(firstStop + beginOffset);
             myEnd.setRow(firstStop + endOffset);
-        	// std::cout << "----------------------------------" << std::endl
-        	// 		  << "|| currentRow:  " << myBegin.currentRow << std::endl
-        	// 		  << "|| currentItem: " << myBegin.currentItem << std::endl
-        	// 		  << "|| rowBegin:    " << myBegin.rowBegin << std::endl
-        	// 		  << "|| rowEnd:      " << myBegin.rowEnd << std::endl
-        	// 		  << "==================================" << std::endl;
             assert(myBegin.valid());
             assert(myEnd.valid());
         }
@@ -813,6 +801,7 @@ class MyDeque {
 		void clear() {
 			clearMap();
 			initMap();
+			mySize = 0;
 			assert(valid());
 		}
 

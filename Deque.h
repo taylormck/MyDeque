@@ -934,11 +934,10 @@ class MyDeque {
 		 */
 		void resize(size_type s, const_reference v = value_type()) {
 			// TODO <your code>
-			iterator resizeEnd = myBegin + s;
-			while (myEnd < resizeEnd) {
+			while (mySize < s) {
 				push_back(v);
 			}
-			while(resizeEnd < myEnd) {
+			while(mySize > s) {
 				pop_back();
 			}
 			assert(valid());
@@ -955,8 +954,6 @@ class MyDeque {
 		 * Swap the contents of this deque and another
 		 */
 		void swap(MyDeque& other) {
-			// TODO <your code>
-
 			if (myAllocator == other.myAllocator) {
 				std::swap(myMap, other.myMap);
 				std::swap(myMapSize, other.myMapSize);

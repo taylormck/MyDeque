@@ -461,6 +461,13 @@ TYPED_TEST(DequeTest, PushBackSizeIsLarge) {
 	EXPECT_EQ(1, this->x.back());
 }
 
+TYPED_TEST(DequeTest, PushBackBunch) {
+	for(typename TestFixture::size_type i = 0; i < this->s; ++i)
+		this->x.push_back(1);
+	EXPECT_EQ(1, this->x.back());
+	EXPECT_EQ(this->s, this->x.size());
+}
+
 
 // --- push_front ---
 
@@ -479,6 +486,13 @@ TYPED_TEST(DequeTest, PushFrontSizeIsLarge) {
 	this->SetLarge();
 	this->x.push_front(1);
 	EXPECT_EQ(1, this->x.front());
+}
+
+TYPED_TEST(DequeTest, PushFrontBunch) {
+	for(typename TestFixture::size_type i = 0; i < this->s; ++i)
+		this->x.push_front(1);
+	EXPECT_EQ(1, this->x.front());
+	EXPECT_EQ(this->s, this->x.size());
 }
 
 // --- resize ---

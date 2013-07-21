@@ -465,10 +465,10 @@ TYPED_TEST_CASE(DequeTest, MyDeques);
 
 // --- push_front ---
 
-TYPED_TEST(DequeTest, PushFrontSizeIsZero) {
-	this->x.push_front(1);
-	EXPECT_EQ(1, this->x.front());
-}
+// TYPED_TEST(DequeTest, PushFrontSizeIsZero) {
+// 	this->x.push_front(1);
+// 	EXPECT_EQ(1, this->x.front());
+// }
 
 TYPED_TEST(DequeTest, PushFrontSizeIsSmall) {
 	this->SetSame();
@@ -1148,11 +1148,6 @@ TEST_F(MyDequeTest, DeallocateMapLarge) {
 
 // --- resizeMap ---
 
-TEST_F(MyDequeTest, ResizeMapEmpty) {
-	x.resizeMap(0);
-	EXPECT_EQ(0, x.myMapSize);
-}
-
 TEST_F(MyDequeTest, ResizeMapSmall) {
 	x.resizeMap(small);
 	EXPECT_EQ(small, x.myMapSize);
@@ -1179,6 +1174,7 @@ TEST_F(MyDequeTest, ResizeMapSmaller) {
 	std::vector<pointer> copy (x.myMap, x.myMap + small);
 
 	x.resizeMap(smaller);
+	assert(false);
 	EXPECT_EQ(smaller, x.myMapSize);
 	for (unsigned int k = 0; k < smaller; ++k)
 		EXPECT_EQ(copy[k], *(x.myMap + k));

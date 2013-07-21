@@ -212,7 +212,7 @@ class MyDeque {
             if (beginDestroy < myEnd) {
             	myEnd = destroy (myAllocator, beginDestroy, myEnd);
             }
-            difference_type endOffset = (myEnd.currentRow - b) - 1;
+            difference_type endOffset = (myEnd.currentRow - b);
 
             // Remove trailing empty rows
             const map_pointer endMap = myMap + myMapSize;
@@ -225,18 +225,8 @@ class MyDeque {
             	*endCopy++ = allocateRow();
 
             // Fix begin and end iterators
-        	std::cout << std::endl 
-        			  << "==================================" << std::endl
-        			  << "|| currentItem: " << myEnd.currentItem << std::endl
-        			  << "|| rowBegin:    " << myEnd.rowBegin << std::endl
-        			  << "|| rowEnd:      " << myEnd.rowEnd << std::endl;
             myBegin.setRow(beginNewMap);
         	myEnd.setRow(beginNewMap + endOffset);
-        	std::cout << "----------------------------------" << std::endl
-        			  << "|| currentItem: " << myEnd.currentItem << std::endl
-        			  << "|| rowBegin:    " << myEnd.rowBegin << std::endl
-        			  << "|| rowEnd:      " << myEnd.rowEnd << std::endl
-        			  << "==================================" << std::endl;
 
             assert(myBegin.valid());    
             assert(myEnd.valid());
@@ -258,8 +248,22 @@ class MyDeque {
                 *newMap++ = allocateRow();
 
             // Fix iterators
-		    myBegin.setRow(firstStop);
-            myEnd.currentRow = firstStop + myMapSize;
+            difference_type beginOffset = myBegin.currentRow - totalBegin.currentRow;
+            difference_type endOffset = myEnd.currentRow - totalBegin.currentRow;
+        	// std::cout << std::endl 
+        	// 		  << "==================================" << std::endl
+        	// 		  << "|| currentRow:  " << myBegin.currentRow << std::endl
+        	// 		  << "|| currentItem: " << myBegin.currentItem << std::endl
+        	// 		  << "|| rowBegin:    " << myBegin.rowBegin << std::endl
+        	// 		  << "|| rowEnd:      " << myBegin.rowEnd << std::endl;
+		    myBegin.setRow(firstStop + beginOffset);
+            myEnd.setRow(firstStop + endOffset);
+        	// std::cout << "----------------------------------" << std::endl
+        	// 		  << "|| currentRow:  " << myBegin.currentRow << std::endl
+        	// 		  << "|| currentItem: " << myBegin.currentItem << std::endl
+        	// 		  << "|| rowBegin:    " << myBegin.rowBegin << std::endl
+        	// 		  << "|| rowEnd:      " << myBegin.rowEnd << std::endl
+        	// 		  << "==================================" << std::endl;
             assert(myBegin.valid());
             assert(myEnd.valid());
         }
@@ -376,7 +380,7 @@ class MyDeque {
 			private:
 
                 bool valid() const {
-
+                	
                     if (currentRow == NULL)
                         return false;
                     if (currentItem < rowBegin)

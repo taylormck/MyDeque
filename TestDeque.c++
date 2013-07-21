@@ -36,7 +36,7 @@
 // Not testing the code we didn't write
 // destroy, unitialized_copy, unitialized_fill
 
-typedef testing::Types</*std::deque<int>,*/ MyDeque<int> > MyDeques;
+typedef testing::Types<std::deque<int>, MyDeque<int> > MyDeques;
 // --- Deque Interface tests ---
 // These are tests that both deques should pass
 
@@ -89,386 +89,386 @@ class DequeTest : public testing::Test {
 
 TYPED_TEST_CASE(DequeTest, MyDeques);
 
-// // --- Constructors ---
+// --- Constructors ---
 
-// TYPED_TEST(DequeTest, AllocatorConstructor) {
-// 	EXPECT_EQ(0, this->x.size());
-// 	EXPECT_EQ(0, this->y.size());
-// }
+TYPED_TEST(DequeTest, AllocatorConstructor) {
+	EXPECT_EQ(0, this->x.size());
+	EXPECT_EQ(0, this->y.size());
+}
 
-// TYPED_TEST(DequeTest, SizedConstructor) {
-// 	typename TestFixture::container v(10, 5);
-// 	ASSERT_EQ(10, v.size());
-// 	for (int i = 0; i < 10; ++i)
-// 		EXPECT_EQ(5, v[i]);
-// }
+TYPED_TEST(DequeTest, SizedConstructor) {
+	typename TestFixture::container v(10, 5);
+	ASSERT_EQ(10, v.size());
+	for (int i = 0; i < 10; ++i)
+		EXPECT_EQ(5, v[i]);
+}
 
-// TYPED_TEST(DequeTest, CopyConstructor) {
-// 	this->SetSame();
-// 	typename TestFixture::container v = this->x;
-// 	EXPECT_EQ(this->x.size(), v.size());
+TYPED_TEST(DequeTest, CopyConstructor) {
+	this->SetSame();
+	typename TestFixture::container v = this->x;
+	EXPECT_EQ(this->x.size(), v.size());
 
-// 	for(unsigned int i = 0; i < v.size(); ++i)
-// 		EXPECT_EQ(this->x[i], v[i]);
-// }
+	for(unsigned int i = 0; i < v.size(); ++i)
+		EXPECT_EQ(this->x[i], v[i]);
+}
 
-// // --- Copy Assignment ---
+// --- Copy Assignment ---
 
-// TYPED_TEST(DequeTest, CopyAssignment) {
-// 	this->SetDifferent();
-// 	ASSERT_EQ(3, this->y[5]);
+TYPED_TEST(DequeTest, CopyAssignment) {
+	this->SetDifferent();
+	ASSERT_EQ(3, this->y[5]);
 
-// 	this->y = this->x;
+	this->y = this->x;
 
-// 	ASSERT_EQ(this->x.size(), this->y.size());
-// 	for (unsigned int i = 0; i < this->x.size(); ++i)
-// 		EXPECT_EQ(this->x[i], this->y[i]);
-// }
+	ASSERT_EQ(this->x.size(), this->y.size());
+	for (unsigned int i = 0; i < this->x.size(); ++i)
+		EXPECT_EQ(this->x[i], this->y[i]);
+}
 
-// // --- operator == ---
+// --- operator == ---
 
-// TYPED_TEST(DequeTest, ContentEqualsOnEmpty) {
-// 	EXPECT_EQ(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, ContentEqualsOnEmpty) {
+	EXPECT_EQ(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, ContentEqualsSmall) {
-// 	this->SetSame();
-// 	EXPECT_EQ(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, ContentEqualsSmall) {
+	this->SetSame();
+	EXPECT_EQ(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, ContentEqualsLarge) {
-// 	this->SetLarge();
-// 	EXPECT_EQ(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, ContentEqualsLarge) {
+	this->SetLarge();
+	EXPECT_EQ(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, ContentNotEqual) {
-// 	this->SetDifferent();
-// 	ASSERT_NE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, ContentNotEqual) {
+	this->SetDifferent();
+	ASSERT_NE(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, SizeNotEqualSize) {
-// 	this->SetSame();
-// 	this->x.push_back(0);
-// 	ASSERT_NE(this->x.size(), this->y.size());
-// }
+TYPED_TEST(DequeTest, SizeNotEqualSize) {
+	this->SetSame();
+	this->x.push_back(0);
+	ASSERT_NE(this->x.size(), this->y.size());
+}
 
-// TYPED_TEST(DequeTest, ContentAndSizeNotEqual) {
-// 	this->SetSame();
-// 	this->x.push_back(0);
-// 	ASSERT_NE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, ContentAndSizeNotEqual) {
+	this->SetSame();
+	this->x.push_back(0);
+	ASSERT_NE(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, ContentNotEqualsLarge) {
-// 	this->SetLarge();
-// 	this->y.at(this->s - 1) = 0;
-// 	ASSERT_NE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, ContentNotEqualsLarge) {
+	this->SetLarge();
+	this->y.at(this->s - 1) = 0;
+	ASSERT_NE(this->x, this->y);
+}
 
-// // --- operator < ---
+// --- operator < ---
 
-// TYPED_TEST(DequeTest, LessThan) {
-// 	this->SetLessContent();
-// 	EXPECT_LT(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, LessThan) {
+	this->SetLessContent();
+	EXPECT_LT(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, LessThanSize) {
-// 	this->SetLessSize();
-// 	EXPECT_LE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, LessThanSize) {
+	this->SetLessSize();
+	EXPECT_LE(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, LessThanLarge) {
-// 	this->SetLarge();
-// 	this->x[0] = 0;
-// 	EXPECT_LE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, LessThanLarge) {
+	this->SetLarge();
+	this->x[0] = 0;
+	EXPECT_LE(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, LessThanEqualEmpty) {
-// 	EXPECT_LE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, LessThanEqualEmpty) {
+	EXPECT_LE(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, LessThanEqual) {
-// 	this->SetLessContent();
-// 	EXPECT_LE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, LessThanEqual) {
+	this->SetLessContent();
+	EXPECT_LE(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, LessThanEqualSelf) {
-// 	this->SetLessContent();
-// 	EXPECT_LE(this->x, this->x);
-// }
+TYPED_TEST(DequeTest, LessThanEqualSelf) {
+	this->SetLessContent();
+	EXPECT_LE(this->x, this->x);
+}
 
-// TYPED_TEST(DequeTest, LessThanEqualSize) {
-// 	this->SetLessSize();
-// 	EXPECT_LE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, LessThanEqualSize) {
+	this->SetLessSize();
+	EXPECT_LE(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, LessThanEqualLarge) {
-// 	this->SetLarge();
-// 	EXPECT_LE(this->x, this->y);
-// 	this->x[0] = 0;
-// 	EXPECT_LE(this->x, this->y);
-// }
+TYPED_TEST(DequeTest, LessThanEqualLarge) {
+	this->SetLarge();
+	EXPECT_LE(this->x, this->y);
+	this->x[0] = 0;
+	EXPECT_LE(this->x, this->y);
+}
 
-// TYPED_TEST(DequeTest, GreaterThanEqualEmpty) {
-// 	EXPECT_GE(this->y, this->x);
-// }
+TYPED_TEST(DequeTest, GreaterThanEqualEmpty) {
+	EXPECT_GE(this->y, this->x);
+}
 
-// TYPED_TEST(DequeTest, GreaterThan) {
-// 	this->SetLessContent();
-// 	EXPECT_GT(this->y, this->x);
-// }
+TYPED_TEST(DequeTest, GreaterThan) {
+	this->SetLessContent();
+	EXPECT_GT(this->y, this->x);
+}
 
-// TYPED_TEST(DequeTest, GreaterThanSize) {
-// 	this->SetLessSize();
-// 	EXPECT_GT(this->y, this->x);
-// }
+TYPED_TEST(DequeTest, GreaterThanSize) {
+	this->SetLessSize();
+	EXPECT_GT(this->y, this->x);
+}
 
-// TYPED_TEST(DequeTest, GreaterThanLarge) {
-// 	this->SetLarge();
-// 	this->x[0] = 0;
-// 	EXPECT_GE(this->y, this->x);
-// }
+TYPED_TEST(DequeTest, GreaterThanLarge) {
+	this->SetLarge();
+	this->x[0] = 0;
+	EXPECT_GE(this->y, this->x);
+}
 
-// TYPED_TEST(DequeTest, GreaterThanEqual) {
-// 	this->SetLessContent();
-// 	EXPECT_GE(this->y, this->x);
-// }
+TYPED_TEST(DequeTest, GreaterThanEqual) {
+	this->SetLessContent();
+	EXPECT_GE(this->y, this->x);
+}
 
-// TYPED_TEST(DequeTest, GreaterThanEqualSelf) {
-// 	this->SetLessContent();
-// 	EXPECT_GE(this->x, this->x);
-// }
+TYPED_TEST(DequeTest, GreaterThanEqualSelf) {
+	this->SetLessContent();
+	EXPECT_GE(this->x, this->x);
+}
 
-// TYPED_TEST(DequeTest, GreaterThanEqualSize) {
-// 	this->SetLessSize();
-// 	EXPECT_GE(this->y, this->x);
-// }
+TYPED_TEST(DequeTest, GreaterThanEqualSize) {
+	this->SetLessSize();
+	EXPECT_GE(this->y, this->x);
+}
 
-// TYPED_TEST(DequeTest, GreaterThanEqualLarge) {
-// 	this->SetLarge();
-// 	EXPECT_GE(this->y, this->x);
-// 	this->x[0] = 0;
-// 	EXPECT_GE(this->y, this->x);
-// }
+TYPED_TEST(DequeTest, GreaterThanEqualLarge) {
+	this->SetLarge();
+	EXPECT_GE(this->y, this->x);
+	this->x[0] = 0;
+	EXPECT_GE(this->y, this->x);
+}
 
-// // --- operator [] ---
+// --- operator [] ---
 
-// TYPED_TEST(DequeTest, IndexZero) {
+TYPED_TEST(DequeTest, IndexZero) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.push_back(9);
+	EXPECT_EQ(9, this->x[0]);
+}
+
+TYPED_TEST(DequeTest, IndexSizeMinusOne) {
+	this->SetSame();
+	ASSERT_EQ(10, this->x.size());
+	this->x.push_back(9);
+	EXPECT_EQ(9, this->x[this->x.size() - 1]);
+}
+
+// --- at ---
+
+TYPED_TEST(DequeTest, AtZero) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.push_back(9);
+	EXPECT_EQ(9, this->x.at(0));
+}
+
+TYPED_TEST(DequeTest, AtSizeMinusOne) {
+	this->SetSame();
+	ASSERT_EQ(10, this->x.size());
+	this->x.push_back(9);
+	EXPECT_EQ(9, this->x.at(this->x.size() - 1));
+}
+
+TYPED_TEST(DequeTest, AtSizeMinusOneWhenSizeIsLarge) {
+	this->SetLarge();
+	ASSERT_EQ(this->s, this->x.size());
+	this->x.push_back(9);
+	EXPECT_EQ(9, this->x.at(this->x.size() - 1));
+}
+
+// --- back ---
+
+TYPED_TEST(DequeTest, BackWhenSizeIsOne) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.push_back(9);
+	EXPECT_EQ(9, this->x.back());
+}
+
+TYPED_TEST(DequeTest, BackWhenSizeIsSmall) {
+	this->SetSame();
+	ASSERT_EQ(10, this->x.size());
+	this->x.push_back(9);
+	EXPECT_EQ(9, this->x.back());
+}
+
+TYPED_TEST(DequeTest, BackWhenSizeIsLarge) {
+	this->SetLarge();
+	ASSERT_EQ(this->s, this->x.size());
+	this->x.push_back(9);
+	EXPECT_EQ(9, this->x.back());
+}
+
+// --- clear ---
+
+TYPED_TEST(DequeTest, ClearEmpty) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.clear();
+	ASSERT_EQ(0, this->x.size());
+}
+
+TYPED_TEST(DequeTest, ClearSmall) {
+	this->SetSame();
+	ASSERT_EQ(10, this->x.size());
+	this->x.clear();
+	ASSERT_EQ(0, this->x.size());
+}
+
+TYPED_TEST(DequeTest, ClearLarge) {
+	this->SetLarge();
+	ASSERT_EQ(this->s, this->x.size());
+	this->x.clear();
+	ASSERT_EQ(0, this->x.size());
+}
+
+// --- empty ---
+
+TYPED_TEST(DequeTest, EmptyEmpty) {
+	ASSERT_TRUE(this->x.empty());
+}
+
+TYPED_TEST(DequeTest, EmptySmall) {
+	this->SetSame();
+	ASSERT_FALSE(this->x.empty());
+}
+
+TYPED_TEST(DequeTest, EmptyLarge) {
+	this->SetLarge();
+	ASSERT_FALSE(this->x.empty());
+}
+
+// --- front ---
+
+// TYPED_TEST(DequeTest, FrontWhenSizeIsOne) {
 // 	ASSERT_EQ(0, this->x.size());
-// 	this->x.push_back(9);
-// 	EXPECT_EQ(9, this->x[0]);
-// }
-
-// TYPED_TEST(DequeTest, IndexSizeMinusOne) {
-// 	this->SetSame();
-// 	ASSERT_EQ(10, this->x.size());
-// 	this->x.push_back(9);
-// 	EXPECT_EQ(9, this->x[this->x.size() - 1]);
-// }
-
-// // --- at ---
-
-// TYPED_TEST(DequeTest, AtZero) {
-// 	ASSERT_EQ(0, this->x.size());
-// 	this->x.push_back(9);
-// 	EXPECT_EQ(9, this->x.at(0));
-// }
-
-// TYPED_TEST(DequeTest, AtSizeMinusOne) {
-// 	this->SetSame();
-// 	ASSERT_EQ(10, this->x.size());
-// 	this->x.push_back(9);
-// 	EXPECT_EQ(9, this->x.at(this->x.size() - 1));
-// }
-
-// TYPED_TEST(DequeTest, AtSizeMinusOneWhenSizeIsLarge) {
-// 	this->SetLarge();
-// 	ASSERT_EQ(this->s, this->x.size());
-// 	this->x.push_back(9);
-// 	EXPECT_EQ(9, this->x.at(this->x.size() - 1));
-// }
-
-// // --- back ---
-
-// TYPED_TEST(DequeTest, BackWhenSizeIsOne) {
-// 	ASSERT_EQ(0, this->x.size());
-// 	this->x.push_back(9);
-// 	EXPECT_EQ(9, this->x.back());
-// }
-
-// TYPED_TEST(DequeTest, BackWhenSizeIsSmall) {
-// 	this->SetSame();
-// 	ASSERT_EQ(10, this->x.size());
-// 	this->x.push_back(9);
-// 	EXPECT_EQ(9, this->x.back());
-// }
-
-// TYPED_TEST(DequeTest, BackWhenSizeIsLarge) {
-// 	this->SetLarge();
-// 	ASSERT_EQ(this->s, this->x.size());
-// 	this->x.push_back(9);
-// 	EXPECT_EQ(9, this->x.back());
-// }
-
-// // --- clear ---
-
-// TYPED_TEST(DequeTest, ClearEmpty) {
-// 	ASSERT_EQ(0, this->x.size());
-// 	this->x.clear();
-// 	ASSERT_EQ(0, this->x.size());
-// }
-
-// TYPED_TEST(DequeTest, ClearSmall) {
-// 	this->SetSame();
-// 	ASSERT_EQ(10, this->x.size());
-// 	this->x.clear();
-// 	ASSERT_EQ(0, this->x.size());
-// }
-
-// TYPED_TEST(DequeTest, ClearLarge) {
-// 	this->SetLarge();
-// 	ASSERT_EQ(this->s, this->x.size());
-// 	this->x.clear();
-// 	ASSERT_EQ(0, this->x.size());
-// }
-
-// // --- empty ---
-
-// TYPED_TEST(DequeTest, EmptyEmpty) {
-// 	ASSERT_TRUE(this->x.empty());
-// }
-
-// TYPED_TEST(DequeTest, EmptySmall) {
-// 	this->SetSame();
-// 	ASSERT_FALSE(this->x.empty());
-// }
-
-// TYPED_TEST(DequeTest, EmptyLarge) {
-// 	this->SetLarge();
-// 	ASSERT_FALSE(this->x.empty());
-// }
-
-// // --- front ---
-
-// // TYPED_TEST(DequeTest, FrontWhenSizeIsOne) {
-// // 	ASSERT_EQ(0, this->x.size());
-// // 	this->x.push_front(9);
-// // 	ASSERT_EQ(9, this->x.front());
-// // }
-
-// TYPED_TEST(DequeTest, FrontWhenSizeIsSmall) {
-// 	this->SetSame();
-// 	ASSERT_EQ(10, this->x.size());
-// 	// assert(false);
 // 	this->x.push_front(9);
 // 	ASSERT_EQ(9, this->x.front());
 // }
 
-// TYPED_TEST(DequeTest, FrontWhenSizeIsLarge) {
-// 	this->SetLarge();
-// 	ASSERT_EQ(this->s, this->x.size());
-// 	this->x.push_front(9);
-// 	ASSERT_EQ(9, this->x.front());
-// }
+TYPED_TEST(DequeTest, FrontWhenSizeIsSmall) {
+	this->SetSame();
+	ASSERT_EQ(10, this->x.size());
+	// assert(false);
+	this->x.push_front(9);
+	ASSERT_EQ(9, this->x.front());
+}
 
-// // --- pop_back ---
+TYPED_TEST(DequeTest, FrontWhenSizeIsLarge) {
+	this->SetLarge();
+	ASSERT_EQ(this->s, this->x.size());
+	this->x.push_front(9);
+	ASSERT_EQ(9, this->x.front());
+}
 
-// TYPED_TEST(DequeTest, PopBackWhenSizeIsOne) {
-// 	ASSERT_EQ(0, this->x.size());
-// 	this->x.push_back(0);
-// 	ASSERT_EQ(1, this->x.size());
-// 	this->x.pop_back();
-// 	ASSERT_EQ(0, this->x.size());
-// }
+// --- pop_back ---
 
-// TYPED_TEST(DequeTest, PopBackWhenSizeIsSmall) {
-// 	this->SetSame();
-// 	EXPECT_EQ(10, this->x.size());
-// 	this->x.front() = 0;
-// 	this->x.back() = 0;
+TYPED_TEST(DequeTest, PopBackWhenSizeIsOne) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.push_back(0);
+	ASSERT_EQ(1, this->x.size());
+	this->x.pop_back();
+	ASSERT_EQ(0, this->x.size());
+}
 
-// 	this->x.pop_back();
-// 	EXPECT_EQ(9, this->x.size());
+TYPED_TEST(DequeTest, PopBackWhenSizeIsSmall) {
+	this->SetSame();
+	EXPECT_EQ(10, this->x.size());
+	this->x.front() = 0;
+	this->x.back() = 0;
 
-// 	EXPECT_EQ(0, this->x.front());
-// 	EXPECT_NE(0, this->x.back());
-// }
+	this->x.pop_back();
+	EXPECT_EQ(9, this->x.size());
 
-// TYPED_TEST(DequeTest, PopBackWhenSizeIsLarge) {
-// 	this->SetLarge();
-// 	EXPECT_EQ(this->s, this->x.size());
-// 	this->x.front() = 0;
-// 	this->x.back() = 0;
+	EXPECT_EQ(0, this->x.front());
+	EXPECT_NE(0, this->x.back());
+}
 
-// 	this->x.pop_back();
-// 	EXPECT_EQ(this->s - 1, this->x.size());
+TYPED_TEST(DequeTest, PopBackWhenSizeIsLarge) {
+	this->SetLarge();
+	EXPECT_EQ(this->s, this->x.size());
+	this->x.front() = 0;
+	this->x.back() = 0;
 
-// 	EXPECT_EQ(0, this->x.front());
-// 	EXPECT_NE(0, this->x.back());
-// }
+	this->x.pop_back();
+	EXPECT_EQ(this->s - 1, this->x.size());
 
-// // --- pop_front ---
+	EXPECT_EQ(0, this->x.front());
+	EXPECT_NE(0, this->x.back());
+}
 
-// TYPED_TEST(DequeTest, PopFrontWhenSizeIsOne) {
-// 	ASSERT_EQ(0, this->x.size());
-// 	this->x.push_front(0);
-// 	ASSERT_EQ(1, this->x.size());
-// 	this->x.pop_front();
-// 	ASSERT_EQ(0, this->x.size());
-// }
+// --- pop_front ---
 
-// TYPED_TEST(DequeTest, PopFrontWhenSizeIsSmall) {
-// 	this->SetSame();
-// 	EXPECT_EQ(10, this->x.size());
-// 	this->x.front() = 0;
-// 	this->x.back() = 0;
+TYPED_TEST(DequeTest, PopFrontWhenSizeIsOne) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.push_front(0);
+	ASSERT_EQ(1, this->x.size());
+	this->x.pop_front();
+	ASSERT_EQ(0, this->x.size());
+}
 
-// 	this->x.pop_front();
-// 	EXPECT_EQ(9, this->x.size());
+TYPED_TEST(DequeTest, PopFrontWhenSizeIsSmall) {
+	this->SetSame();
+	EXPECT_EQ(10, this->x.size());
+	this->x.front() = 0;
+	this->x.back() = 0;
 
-// 	EXPECT_NE(0, this->x.front());
-// 	EXPECT_EQ(0, this->x.back());
-// }
+	this->x.pop_front();
+	EXPECT_EQ(9, this->x.size());
 
-// TYPED_TEST(DequeTest, PopFrontWhenSizeIsLarge) {
-// 	this->SetLarge();
-// 	EXPECT_EQ(this->s, this->x.size());
-// 	this->x.front() = 0;
-// 	this->x.back() = 0;
+	EXPECT_NE(0, this->x.front());
+	EXPECT_EQ(0, this->x.back());
+}
 
-// 	this->x.pop_front();
-// 	EXPECT_EQ(this->s - 1, this->x.size());
+TYPED_TEST(DequeTest, PopFrontWhenSizeIsLarge) {
+	this->SetLarge();
+	EXPECT_EQ(this->s, this->x.size());
+	this->x.front() = 0;
+	this->x.back() = 0;
 
-// 	EXPECT_NE(0, this->x.front());
-// 	EXPECT_EQ(0, this->x.back());
-// }
+	this->x.pop_front();
+	EXPECT_EQ(this->s - 1, this->x.size());
+
+	EXPECT_NE(0, this->x.front());
+	EXPECT_EQ(0, this->x.back());
+}
 
 
-// // --- push_back ---
+// --- push_back ---
 
-// TYPED_TEST(DequeTest, PushBackSizeIsZero) {
-// 	this->x.push_back(1);
-// 	EXPECT_EQ(1, this->x.back());
-// }
+TYPED_TEST(DequeTest, PushBackSizeIsZero) {
+	this->x.push_back(1);
+	EXPECT_EQ(1, this->x.back());
+}
 
-// TYPED_TEST(DequeTest, PushBackSizeIsSmall) {
-// 	this->SetSame();
-// 	this->x.push_back(1);
-// 	EXPECT_EQ(1, this->x.back());
-// }
+TYPED_TEST(DequeTest, PushBackSizeIsSmall) {
+	this->SetSame();
+	this->x.push_back(1);
+	EXPECT_EQ(1, this->x.back());
+}
 
-// TYPED_TEST(DequeTest, PushBackSizeIsLarge) {
-// 	this->SetLarge();
-// 	this->x.push_back(1);
-// 	EXPECT_EQ(1, this->x.back());
-// }
+TYPED_TEST(DequeTest, PushBackSizeIsLarge) {
+	this->SetLarge();
+	this->x.push_back(1);
+	EXPECT_EQ(1, this->x.back());
+}
 
 
 // --- push_front ---
 
-// TYPED_TEST(DequeTest, PushFrontSizeIsZero) {
-// 	this->x.push_front(1);
-// 	EXPECT_EQ(1, this->x.front());
-// }
+TYPED_TEST(DequeTest, PushFrontSizeIsZero) {
+	this->x.push_front(1);
+	EXPECT_EQ(1, this->x.front());
+}
 
 TYPED_TEST(DequeTest, PushFrontSizeIsSmall) {
 	this->SetSame();
@@ -1179,8 +1179,7 @@ TEST_F(MyDequeTest, ResizeMapSmaller) {
 // --- growMap ---
 
 TEST_F(MyDequeTest, GrowMap) {
-	x.myMap = x.myMapAllocator.allocate(1);
-	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
+	x.initMap();
 	const size_type s = 3;
 
 	x.growMap();
@@ -1189,8 +1188,7 @@ TEST_F(MyDequeTest, GrowMap) {
 }
 
 TEST_F(MyDequeTest, GrowMapTwice) {
-	x.myMap = x.myMapAllocator.allocate(1);
-	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
+	x.initMap();
 	const size_type s = 9;
 
 	x.growMap();
@@ -1200,9 +1198,7 @@ TEST_F(MyDequeTest, GrowMapTwice) {
 }
 
 TEST_F(MyDequeTest, GrowMapRepeated) {
-	x.myMap = x.myMapAllocator.allocate(1);
-	*(x.myMap) = x.myAllocator.allocate(container::ROW_SIZE);
-	size_type baseS = 3;
+	x.initMap();	size_type baseS = 3;
 	size_type numGrows = 10;
 	size_type s = std::pow(baseS, numGrows);
 

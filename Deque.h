@@ -844,7 +844,6 @@ class MyDeque {
 			erase(j);
 			assert(valid());
 			return i;
-			// TODO <your code>
 		}
 
 		/**
@@ -864,11 +863,20 @@ class MyDeque {
 		/**
 		 * Insert an element into this iterator
 		 */
-		iterator insert(iterator, const_reference) {
-			++mySize;
-			// TODO <your code>
-			// assert(valid());
-			return iterator();
+		iterator insert(iterator i , const_reference v) {
+			if (i == myBegin) {
+				push_front(v);
+				return myBegin;
+			}
+			else if (i == myEnd) {
+				push_back(v);
+				return myEnd;
+			}
+			const_reference tmp = *i;
+			*i = v;
+			insert(i + 1, tmp);
+			assert(valid());
+			return i;
 		}
 
 		/**

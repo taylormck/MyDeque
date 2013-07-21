@@ -866,6 +866,8 @@ class MyDeque {
 		 */
 		void pop_back() {
 			--mySize;
+			--myEnd;
+			myAllocator.destroy(&*myEnd);
 			// TODO <your code>
 			assert(valid());
 		}

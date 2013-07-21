@@ -1,1 +1,27 @@
+Running main() from gtest_main.cc
+[==========] Running 72 tests from 3 test cases.
+[----------] Global test environment set-up.
+[----------] 15 tests from DequeTest/0, where TypeParam = MyDeque<int, std::allocator<int> >
+[ RUN      ] DequeTest/0.PushBackBunch
+|| Entering addRowBack
+|| Successfully allocated another map
+|| Entering addRowBack
+|| Successfully allocated another map
 
+||===============================
+|| myEnd
+||-------------------------------
+|| currentRow  = 0x5c543d0
+|| currentItem = 0x100
+|| rowBegin    = 0
+|| rowEnd      = 0x200
+||-------------------------------
+|| Got to atEnd
+||-------------------------------
+|| atEnd returned false
+||-------------------------------
+|| currentRow  = 0x5c543d0
+|| currentItem = 0x100
+|| rowBegin    = 0
+|| rowEnd      = 0x200
+||===============================

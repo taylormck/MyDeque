@@ -101,215 +101,11 @@ class MyDeque {
                                                 rhs.myBegin, rhs.myEnd);
 		}
 
-    public:
-        class iterator;
-
 	private:
 		const static unsigned int LOG_ROW_SIZE = 7;
 		const static difference_type ROW_SIZE = 1 << LOG_ROW_SIZE;
 
-		size_type mySize;
-		size_type myMapSize;
-		
-		allocator_type myAllocator;
-		map_allocator_type myMapAllocator;
-		
-		map_pointer myMap;
-
-        iterator myBegin;
-        iterator myEnd;
-
-        iterator totalBegin;
-        iterator totalEnd;
-
-	private:
-
-		bool valid() const {
-			if (myMap == NULL)
-				return false;
-            if (!myBegin.valid())
-				return false;
-			if (!myEnd.valid())
-				return false;
-			if (!totalBegin.valid())
-				return false;
-			if (!totalEnd.valid())
-				return false;
-			if (myBegin > myEnd)
-				return false;
-			if (myBegin < totalBegin)
-				return false;
-			if (myEnd > totalEnd)
-				return false;
-            if (myMapSize < 1)
-                return false;
-
-			return true;
-		}
-
-        /**
-         * Helper function to allocate one row
-         */
-        pointer allocateRow() {
-            return myAllocator.allocate(ROW_SIZE);
-        }
-
-        /**
-         * Helper function to deallocate one row
-         */
-        void deallocateRow(pointer row) {
-        	myAllocator.deallocate(row, ROW_SIZE);
-        }
-
-        /**
-         * Helper function to allocate a map
-         */
-        map_pointer allocateMap(size_type n) {
-            return myMapAllocator.allocate(n);
-        }
-
-        /**
-         * Helper function to deallocate a map
-         */
-        void deallocateMap(map_pointer map, size_type n) {
-            myMapAllocator.deallocate(map, n);
-        }
-
-        /**
-         * Helper function to initialize the memory
-         */
-         void initMap() {
-         	myMap = allocateMap(1);
-         	*myMap = allocateRow();
-			totalBegin = iterator(*myMap, myMap);
-			myBegin = totalBegin + ROW_SIZE / 2;
-			myEnd = myBegin;
-			totalEnd = totalBegin + ROW_SIZE;
-			myMapSize = 1;
-         }
-
-        /**
-         * Helper function to shrink the deque
-         * Will leave leading values, cuts trailing values
-         */
-        void resizeMapSmaller(size_type n, map_pointer newMap) {
-        	assert(n < myMapSize);
-        	const map_pointer beginNewMap = newMap;
-
-            // Trim off the empty space at the beginning
-            map_pointer firstFilledRow = myBegin.currentRow;
-            map_pointer b = myMap;
-            map_pointer e = myMap + n;
-            while(b != firstFilledRow) {
-            	deallocateRow(*b++);
-            }
-
-            // Copy the rows into the new map
-            map_pointer endCopy = std::copy(b, e, newMap);
-
-            // Destroy the objects that won't fit
-            iterator beginDestroy = iterator(*e, e);
-            if (beginDestroy < myEnd) {
-            	myEnd = destroy (myAllocator, beginDestroy, myEnd);
-            }
-            difference_type endOffset = (myEnd.currentRow - b);
-
-            // Remove trailing empty rows
-            const map_pointer endMap = myMap + myMapSize;
-            while (e < endMap)
-            	deallocateRow(*e++);
-
-            // Fill in trailing empty rows
-            const map_pointer endNewMap = newMap + n;
-            while (endCopy < endNewMap)
-            	*endCopy++ = allocateRow();
-
-            // Fix begin and end iterators
-            myBegin.setRow(beginNewMap);
-        	myEnd.setRow(beginNewMap + endOffset);
-
-            assert(myBegin.valid());    
-            assert(myEnd.valid());
-        }
-
-        /**
-         * Allocates more space for this deque
-         * Attempts to place existing data in the middle
-         */
-        void resizeMapLarger(size_type n, map_pointer newMap) {
-        	assert(n > myMapSize);
-            map_pointer firstStop = newMap + ((n - myMapSize) / 2);
-            map_pointer e = newMap + n;
-
-            while(newMap != firstStop)
-                *newMap++ = allocateRow();
-            newMap = std::copy(myMap, myMap + myMapSize, newMap);
-            while(newMap != e)
-                *newMap++ = allocateRow();
-
-            // Fix iterators
-            difference_type beginOffset = myBegin.currentRow - totalBegin.currentRow;
-            difference_type endOffset = myEnd.currentRow - totalBegin.currentRow;
-		    myBegin.setRow(firstStop + beginOffset);
-            myEnd.setRow(firstStop + endOffset);
-            assert(myBegin.valid());
-            assert(myEnd.valid());
-        }
-
-        /**
-         * Helper function to resize the map, allocating/deallocating
-         * more rows as necessary
-         */
-        void resizeMap(size_type n) {
-            assert(n >= 0);
-            assert(valid());
-        	// Case 1, we are already size n
-        	if (n == myMapSize)
-        		return;
-
-        	// Build new map
-            const map_pointer newMap = allocateMap(n);
-
-        	// Case 2, we are larger than size n
-        	if (n < myMapSize)
-        		resizeMapSmaller(n, newMap);
-            else
-            	resizeMapLarger(n, newMap);
-            
-            // Destroy old map
-            deallocateMap(myMap, myMapSize);
-
-            // Finally swap the maps and delete the old one
-            myMap = newMap;
-            myMapSize = n;
-
-            // Set the total iterators and assert validity
-            totalBegin = iterator(*myMap, myMap);
-            totalEnd = iterator(*(myMap + n), myMap + n);
-            assert(valid());
-        }
-
-        /**
-         * Triples the size of the map
-         */
-        void growMap() {
-        	assert(valid());
-        	resizeMap(3 * myMapSize);
-        }
-
-        /**
-         * Deletes the map and all the data
-         */
-        void clearMap() {
-        	// assert(false && "clearMap");
-            destroy(myAllocator, myBegin, myEnd);
-            for (map_pointer i = myMap; i < myMap + myMapSize; ++i)
-            	deallocateRow(*i);
-            deallocateMap(myMap, myMapSize);
-        }
-
 	public:
-
         // These are constant time +=, so I could use it later
 		class iterator {
 			public:
@@ -668,6 +464,260 @@ class MyDeque {
 				}
 		};
 
+	private:
+
+		size_type mySize;
+		size_type myMapSize;
+		
+		allocator_type myAllocator;
+		map_allocator_type myMapAllocator;
+		
+		map_pointer myMap;
+
+        iterator myBegin;
+        iterator myEnd;
+
+	private:
+
+		bool valid() const {
+			if (myMap == NULL)
+				return false;
+            if (!myBegin.valid())
+				return false;
+			if (!myEnd.valid())
+				return false;
+			if (myBegin > myEnd)
+				return false;
+            if (myMapSize < 1)
+                return false;
+
+			return true;
+		}
+
+		/**
+		 * Helper function to determine if we're at the end of the
+		 * MyDeque yet
+		 */
+		 bool atEnd() const {
+		 	std::cout << "|| Got to atEnd" << std::endl;
+		 	if (myEnd.currentRow == myMap + myMapSize) {
+		 		std::cout << "|| currentRow == myMap + myMapSize" << std::endl;
+		 	}
+		 	if (myEnd.currentItem >= myEnd.rowEnd - 1) {
+		 		std::cout << "|| currentItem >= rowEnd - 1" << std::endl;
+		 	}
+
+		 	return ((myEnd.currentRow == myMap + myMapSize) &&
+		 			(myEnd.currentItem >= myEnd.rowEnd - 1));
+		 }
+
+		/**
+		 * Helper function to determine if we're at the end of the
+		 * MyDeque yet
+		 */
+		 bool atBegin() const {
+		 	return ((myBegin.currentRow == myMap) &&
+		 			(myBegin.currentItem == myBegin.rowBegin));
+		 }
+
+        /**
+         * Helper function to allocate one row
+         */
+        pointer allocateRow() {
+            return myAllocator.allocate(ROW_SIZE);
+        }
+
+        /**
+         * Helper function to deallocate one row
+         */
+        void deallocateRow(pointer row) {
+        	myAllocator.deallocate(row, ROW_SIZE);
+        }
+
+        /**
+         * Helper function to allocate a map
+         */
+        map_pointer allocateMap(size_type n) {
+        	std::cout << "|| in allocateMap" << std::endl;
+            map_pointer result = myMapAllocator.allocate(n);
+        	std::cout << "|| after allocating" << std::endl;
+        	return result;
+        }
+
+        /**
+         * Helper function to deallocate a map
+         */
+        void deallocateMap(map_pointer map, size_type n) {
+            myMapAllocator.deallocate(map, n);
+        }
+
+        /**
+         * Helper function to initialize the memory
+         */
+         void initMap() {
+         	myMap = allocateMap(1);
+         	*myMap = allocateRow();
+         	myBegin = iterator(*myMap + ROW_SIZE / 2, myMap);
+			myEnd = myBegin;
+			myMapSize = 1;
+         }
+
+        /**
+         * Helper function to shrink the deque
+         * Will leave leading values, cuts trailing values
+         */
+        void resizeMapSmaller(size_type n, map_pointer newMap) {
+        	assert(n < myMapSize);
+        	const map_pointer beginNewMap = newMap;
+
+            // Trim off the empty space at the beginning
+            map_pointer firstFilledRow = myBegin.currentRow;
+            map_pointer b = myMap;
+            map_pointer e = myMap + n;
+            while(b != firstFilledRow) {
+            	deallocateRow(*b++);
+            }
+
+            // Copy the rows into the new map
+            map_pointer endCopy = std::copy(b, e, newMap);
+
+            // Destroy the objects that won't fit
+            iterator beginDestroy = iterator(*e, e);
+            if (beginDestroy < myEnd) {
+            	myEnd = destroy (myAllocator, beginDestroy, myEnd);
+            }
+            difference_type endOffset = (myEnd.currentRow - b);
+
+            // Remove trailing empty rows
+            const map_pointer endMap = myMap + myMapSize;
+            while (e < endMap)
+            	deallocateRow(*e++);
+
+            // Fill in trailing empty rows
+            const map_pointer endNewMap = newMap + n;
+            while (endCopy < endNewMap)
+            	*endCopy++ = allocateRow();
+
+            // Fix begin and end iterators
+            myBegin.setRow(beginNewMap);
+        	myEnd.setRow(beginNewMap + endOffset);
+
+            assert(myBegin.valid());    
+            assert(myEnd.valid());
+        }
+
+        /**
+         * Allocates more space for this deque
+         * Attempts to place existing data in the middle
+         */
+        void resizeMapLarger(size_type n, map_pointer newMap) {
+        	std::cout << "|| in resizeMapLarger" << std::endl;
+        	assert(n > myMapSize);
+            map_pointer firstStop = newMap + ((n - myMapSize) / 2);
+            map_pointer e = newMap + n;
+
+            while(newMap != firstStop)
+                *newMap++ = allocateRow();
+            newMap = std::copy(myMap, myMap + myMapSize, newMap);
+            while(newMap != e)
+                *newMap++ = allocateRow();
+
+            // Fix iterators
+            difference_type beginOffset = myBegin.currentRow - myMap;
+            difference_type endOffset = (myEnd.currentRow - myMap);
+            std::cout << std::endl
+             		  << "||===============================" << std::endl
+             		  << "|| myBegin" << std::endl
+             		  << "|| beginOffset = " << beginOffset << std::endl
+             		  << "||-------------------------------" << std::endl
+             		  << "|| currentRow  = " << myBegin.currentRow << std::endl
+             		  << "|| currentItem = " << myBegin.currentItem << std::endl
+             		  << "|| rowBegin    = " << myBegin.rowBegin << std::endl
+             		  << "|| rowEnd      = " << myBegin.rowEnd << std::endl
+             		  << "||-------------------------------" << std::endl;
+		    myBegin.setRow(firstStop + beginOffset);
+            std::cout << "|| currentRow  = " << myBegin.currentRow << std::endl
+             		  << "|| currentItem = " << myBegin.currentItem << std::endl
+             		  << "|| rowBegin    = " << myBegin.rowBegin << std::endl
+             		  << "|| rowEnd      = " << myBegin.rowEnd << std::endl
+             		  << "||===============================" << std::endl;
+            std::cout << std::endl
+             		  << "||===============================" << std::endl
+             		  << "|| myEnd" << std::endl
+             		  << "|| endOffset   = " << endOffset << std::endl
+             		  << "||-------------------------------" << std::endl
+             		  << "|| currentRow  = " << myEnd.currentRow << std::endl
+             		  << "|| currentItem = " << myEnd.currentItem << std::endl
+             		  << "|| rowBegin    = " << myEnd.rowBegin << std::endl
+             		  << "|| rowEnd      = " << myEnd.rowEnd << std::endl
+             		  << "||-------------------------------" << std::endl;
+            myEnd.setRow(firstStop + endOffset);
+
+            std::cout << "|| currentRow  = " << myEnd.currentRow << std::endl
+             		  << "|| currentItem = " << myEnd.currentItem << std::endl
+             		  << "|| rowBegin    = " << myEnd.rowBegin << std::endl
+             		  << "|| rowEnd      = " << myEnd.rowEnd << std::endl
+             		  << "||===============================" << std::endl;
+            assert(myBegin.valid());
+            assert(myEnd.valid());
+        }
+
+        /**
+         * Helper function to resize the map, allocating/deallocating
+         * more rows as necessary
+         */
+        void resizeMap(size_type n) {
+        	std::cout << "|| in resizeMap" << std::endl;
+            assert(n >= 0);
+            assert(valid());
+        	// Case 1, we are already size n
+        	if (n == myMapSize)
+        		return;
+
+        	std::cout << "|| n != myMapSize" << std::endl
+        			  << "|| attempting to allocate memory" << std::endl
+        			  << "|| size allocating = " << n << std::endl;
+
+        	// Build new map
+            const map_pointer newMap = allocateMap(n);
+
+            std::cout << "|| allocated newMap" << std::endl;
+
+        	// Case 2, we are larger than size n
+        	if (n < myMapSize)
+        		resizeMapSmaller(n, newMap);
+            else
+            	resizeMapLarger(n, newMap);
+            
+            // Destroy old map
+            deallocateMap(myMap, myMapSize);
+
+            // Finally swap the maps and delete the old one
+            myMap = newMap;
+            myMapSize = n;
+
+            assert(valid());
+        }
+
+        /**
+         * Triples the size of the map
+         */
+        void growMap() {
+        	std::cout << "|| in growMap" << std::endl;
+        	assert(valid());
+        	resizeMap(3 * myMapSize);
+        }
+
+        /**
+         * Deletes the map and all the data
+         */
+        void clearMap() {
+            destroy(myAllocator, myBegin, myEnd);
+            for (map_pointer i = myMap; i < myMap + myMapSize; ++i)
+            	deallocateRow(*i);
+            deallocateMap(myMap, myMapSize);
+        }
+
 	public:
 		/**
 		 * Create an empty MyDeque,
@@ -904,8 +954,32 @@ class MyDeque {
 		 * Append an element the end of this MyDeque
 		 */
 		void push_back(const_reference v) {
-            if(myEnd == totalEnd)
+			assert(valid());
+            std::cout << std::endl
+             		  << "||===============================" << std::endl
+             		  << "|| myEnd" << std::endl
+             		  << "||-------------------------------" << std::endl
+             		  << "|| currentRow  = " << myEnd.currentRow << std::endl
+             		  << "|| currentItem = " << myEnd.currentItem << std::endl
+             		  << "|| rowBegin    = " << myEnd.rowBegin << std::endl
+             		  << "|| rowEnd      = " << myEnd.rowEnd << std::endl
+             		  << "||-------------------------------" << std::endl;
+            if(atEnd()) {
+            	std::cout << "||-------------------------------" << std::endl
+            			  << "|| atEnd returned true" << std::endl
+             		  	  << "||-------------------------------" << std::endl
+            			  << "|| attempting growMap"  << std::endl;
                 growMap();
+            	std::cout << "|| returned from growMap" << std::endl;
+            }
+            std::cout << "||-------------------------------" << std::endl
+            		  << "|| atEnd returned false" << std::endl
+             		  << "||-------------------------------" << std::endl
+             		  << "|| currentRow  = " << myEnd.currentRow << std::endl
+             		  << "|| currentItem = " << myEnd.currentItem << std::endl
+             		  << "|| rowBegin    = " << myEnd.rowBegin << std::endl
+             		  << "|| rowEnd      = " << myEnd.rowEnd << std::endl
+             		  << "||===============================" << std::endl;
             myAllocator.construct(&*myEnd, v);
             ++myEnd;
 			++mySize;
@@ -917,7 +991,7 @@ class MyDeque {
 		 */
 		void push_front(const_reference v) {
 			assert(valid());
-            if(myBegin == totalBegin)
+            if(atBegin())
                 growMap();
             --myBegin;
             myAllocator.construct(&*myBegin, v);
@@ -957,8 +1031,6 @@ class MyDeque {
 			if (myAllocator == other.myAllocator) {
 				std::swap(myMap, other.myMap);
 				std::swap(myMapSize, other.myMapSize);
-				std::swap(totalBegin, other.totalBegin);
-				std::swap(totalEnd, other.totalEnd);
 				std::swap(myBegin, other.myBegin);
 				std::swap(myEnd, other.myEnd);
 				std::swap(mySize, other.mySize);

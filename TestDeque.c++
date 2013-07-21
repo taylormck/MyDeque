@@ -468,7 +468,6 @@ TYPED_TEST(DequeTest, PushBackBunch) {
 	EXPECT_EQ(this->s, this->x.size());
 }
 
-
 // --- push_front ---
 
 TYPED_TEST(DequeTest, PushFrontSizeIsZero) {

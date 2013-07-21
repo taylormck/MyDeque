@@ -36,7 +36,7 @@
 // Not testing the code we didn't write
 // destroy, unitialized_copy, unitialized_fill
 
-typedef testing::Types<std::deque<int>, MyDeque<int> > MyDeques;
+typedef testing::Types</*std::deque<int>,*/ MyDeque<int> > MyDeques;
 // --- Deque Interface tests ---
 // These are tests that both deques should pass
 
@@ -349,16 +349,15 @@ TYPED_TEST(DequeTest, EmptyLarge) {
 
 // --- front ---
 
-// TYPED_TEST(DequeTest, FrontWhenSizeIsOne) {
-// 	ASSERT_EQ(0, this->x.size());
-// 	this->x.push_front(9);
-// 	ASSERT_EQ(9, this->x.front());
-// }
+TYPED_TEST(DequeTest, FrontWhenSizeIsOne) {
+	ASSERT_EQ(0, this->x.size());
+	this->x.push_front(9);
+	ASSERT_EQ(9, this->x.front());
+}
 
 TYPED_TEST(DequeTest, FrontWhenSizeIsSmall) {
 	this->SetSame();
 	ASSERT_EQ(10, this->x.size());
-	// assert(false);
 	this->x.push_front(9);
 	ASSERT_EQ(9, this->x.front());
 }
@@ -504,19 +503,21 @@ TYPED_TEST(DequeTest, ResizeShrink) {
 
 TYPED_TEST(DequeTest, ResizeGrowLarge) {
 	this->SetLarge();
+	typename TestFixture::size_type larger = this->s * 2;
 	ASSERT_EQ(this->s, this->x.size());
 	ASSERT_EQ(5, this->x.back());
-	this->x.resize(this->s * 2, 9);
-	ASSERT_EQ(this->s * 2, this->x.size());
+	this->x.resize(larger, 9);
+	EXPECT_EQ(larger, this->x.size());
 	ASSERT_EQ(9, this->x.back());
 }
 
 TYPED_TEST(DequeTest, ResizeShrinkLarge) {
 	this->SetLarge();
+	typename TestFixture::size_type smaller = this->s / 2;
 	ASSERT_EQ(this->s, this->x.size());
 	ASSERT_EQ(5, this->x.back());
-	this->x.resize(this->s / 2, 9);
-	ASSERT_EQ(this->s / 2, this->x.size());
+	this->x.resize(smaller, 9);
+	EXPECT_EQ(smaller, this->x.size());
 	ASSERT_EQ(5, this->x.back());
 }
 
@@ -542,7 +543,9 @@ TYPED_TEST(DequeTest, SizeIsLarge) {
 TYPED_TEST(DequeTest, SwapEmpty) {
 	EXPECT_EQ(0, this->x.size());
 	EXPECT_EQ(0, this->y.size());
-	std::swap(this->x, this->y);  // This will call x.swap
+
+	this->x.swap(this->y);
+
 	EXPECT_EQ(0, this->x.size());
 	EXPECT_EQ(0, this->y.size());
 }
@@ -554,7 +557,7 @@ TYPED_TEST(DequeTest, SwapSmall) {
 	EXPECT_EQ(5, this->x[5]);
 	EXPECT_EQ(3, this->y[5]);
 
-	std::swap(this->x, this->y);  // This will call x.swap
+	this->x.swap(this->y);
 
 	EXPECT_EQ(10, this->x.size());
 	EXPECT_EQ(10, this->y.size());
@@ -564,7 +567,7 @@ TYPED_TEST(DequeTest, SwapSmall) {
 	this->y.push_back(5);
 	EXPECT_EQ(11, this->y.size());
 
-	std::swap(this->x, this->y);
+	this->x.swap(this->y);
 
 	EXPECT_EQ(11, this->x.size());
 	EXPECT_EQ(10, this->y.size());
@@ -581,7 +584,7 @@ TYPED_TEST(DequeTest, SwapLarge) {
 	EXPECT_EQ(5, this->x[5]);
 	EXPECT_EQ(3, this->y[5]);
 
-	std::swap(this->x, this->y);  // This will call x.swap
+	this->x.swap(this->y);
 
 	EXPECT_EQ(this->s, this->x.size());
 	EXPECT_EQ(this->s, this->y.size());
@@ -591,7 +594,7 @@ TYPED_TEST(DequeTest, SwapLarge) {
 	this->y.push_back(5);
 	EXPECT_EQ(this->s + 1, this->y.size());
 
-	std::swap(this->x, this->y);
+	this->x.swap(this->y);
 
 	EXPECT_EQ(this->s + 1, this->x.size());
 	EXPECT_EQ(this->s, this->y.size());

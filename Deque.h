@@ -301,6 +301,7 @@ class MyDeque {
          * Deletes the map and all the data
          */
         void clearMap() {
+        	// assert(false && "clearMap");
             destroy(myAllocator, myBegin, myEnd);
             for (map_pointer i = myMap; i < myMap + myMapSize; ++i)
             	deallocateRow(*i);
@@ -933,7 +934,13 @@ class MyDeque {
 		 */
 		void resize(size_type s, const_reference v = value_type()) {
 			// TODO <your code>
-			mySize = s;
+			iterator resizeEnd = myBegin + s;
+			while (myEnd < resizeEnd) {
+				push_back(v);
+			}
+			while(resizeEnd < myEnd) {
+				pop_back();
+			}
 			assert(valid());
 		}
 
@@ -949,6 +956,22 @@ class MyDeque {
 		 */
 		void swap(MyDeque& other) {
 			// TODO <your code>
+
+			if (myAllocator == other.myAllocator) {
+				std::swap(myMap, other.myMap);
+				std::swap(myMapSize, other.myMapSize);
+				std::swap(totalBegin, other.totalBegin);
+				std::swap(totalEnd, other.totalEnd);
+				std::swap(myBegin, other.myBegin);
+				std::swap(myEnd, other.myEnd);
+				std::swap(mySize, other.mySize);
+			}
+			else {
+				// This will do the slow call
+				// using a temporary storage MyDeque
+				std::swap(*this, other);
+			}
+
 			assert(valid());
 		}
 };

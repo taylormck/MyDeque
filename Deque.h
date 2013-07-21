@@ -831,7 +831,17 @@ class MyDeque {
 		 * Remove the element pointed to by i
 		 */
 		iterator erase(iterator i) {
-			--mySize;
+			if (i == myBegin) {
+				pop_front();
+				--mySize;
+			}
+			if (i == myEnd) {
+				pop_back();
+				--mySize;
+			}
+			iterator j = i + 1;
+			*i = *j;
+			erase(j);
 			// TODO <your code>
 			assert(valid());
 			return iterator();
@@ -878,7 +888,6 @@ class MyDeque {
 			--mySize;
 			myAllocator.destroy(&*myBegin);
 			++myBegin;
-			// TODO <your code>
 			assert(valid());
 		}
 

@@ -36,7 +36,7 @@
 // Not testing the code we didn't write
 // destroy, unitialized_copy, unitialized_fill
 
-typedef testing::Types</*std::deque<int>,*/ MyDeque<int> > MyDeques;
+typedef testing::Types<std::deque<int>, MyDeque<int> > MyDeques;
 // --- Deque Interface tests ---
 // These are tests that both deques should pass
 
@@ -119,15 +119,6 @@ TYPED_TEST(DequeTest, CopyConstructor) {
 		EXPECT_EQ(this->x[i], v[i]);
 }
 
-TYPED_TEST(DequeTest, CopyConstructorLarge) {
-	this->SetLarge();
-	typename TestFixture::container v = this->x;
-	ASSERT_EQ(this->x.size(), v.size());
-
-	for(unsigned int i = 0; i < v.size(); ++i)
-		EXPECT_EQ(this->x[i], v[i]);
-}
-
 // --- Copy Assignment ---
 
 TYPED_TEST(DequeTest, CopyAssignment) {
@@ -138,17 +129,6 @@ TYPED_TEST(DequeTest, CopyAssignment) {
 
 	ASSERT_EQ(this->x.size(), this->y.size());
 	for (unsigned int i = 0; i < this->x.size(); ++i)
-		EXPECT_EQ(this->x[i], this->y[i]);
-}
-
-TYPED_TEST(DequeTest, CopyAssignmentLarge) {
-	this->SetLarge();
-	ASSERT_EQ(3, this->y[5]);
-
-	this->y = this->x;
-
-	ASSERT_EQ(this->x.size(), this->y.size());
-	for (typename TestFixture::size_type i = 0; i < this->x.size(); ++i)
 		EXPECT_EQ(this->x[i], this->y[i]);
 }
 
@@ -1106,16 +1086,6 @@ TEST_F(MyDequeTest, CopyConstructorSmall) {
 
 	container z (y);
 	EXPECT_EQ(small, z.size());
-	EXPECT_EQ(a, z.myAllocator);
-}
-
-TEST_F(MyDequeTest, CopyConstructorLarge) {
-	container y (large, v);
-	EXPECT_EQ(large, y.size());
-	EXPECT_EQ(a, y.myAllocator);
-
-	container z (y);
-	EXPECT_EQ(large, z.size());
 	EXPECT_EQ(a, z.myAllocator);
 }
 

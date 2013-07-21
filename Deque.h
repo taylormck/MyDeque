@@ -597,16 +597,6 @@ class MyDeque {
          	assert(valid());
         }
 
-        /**
-         * Deletes the map and all the data
-         */
-        void clearMap() {
-            destroy(myAllocator, myBegin, myEnd);
-            for (map_pointer i = myMap; i < myMap + myMapSize; ++i)
-            	deallocateRow(*i);
-            deallocateMap(myMap, myMapSize);
-        }
-
 	public:
 		/**
 		 * Create an empty MyDeque,
@@ -657,7 +647,12 @@ class MyDeque {
 		 * Erase all data from the deque, releasing the memory
 		 */
 		~MyDeque() {
-            clearMap();
+			// Clear our data
+            destroy(myAllocator, myBegin, myEnd);
+            // Now deallocate the rows and the map
+            for (map_pointer i = myMap; i < myMap + myMapSize; ++i)
+            	deallocateRow(*i);
+            deallocateMap(myMap, myMapSize);
 		}
 
 		/**

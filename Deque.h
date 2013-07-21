@@ -200,8 +200,9 @@ class MyDeque {
             map_pointer firstFilledRow = myBegin.currentRow;
             map_pointer b = myMap;
             map_pointer e = myMap + n;
-            while(b != firstFilledRow)
+            while(b != firstFilledRow) {
             	deallocateRow(*b++);
+            }
 
             // Copy the rows into the new map
             map_pointer endCopy = std::copy(b, e, newMap);
@@ -211,28 +212,30 @@ class MyDeque {
             if (beginDestroy < myEnd) {
             	myEnd = destroy (myAllocator, beginDestroy, myEnd);
             }
+            difference_type endOffset = (myEnd.currentRow - b) - 1;
 
             // Remove trailing empty rows
-            map_pointer endMap = myMap + myMapSize;
+            const map_pointer endMap = myMap + myMapSize;
             while (e < endMap)
             	deallocateRow(*e++);
 
             // Fill in trailing empty rows
-            map_pointer endNewMap = newMap + n;
+            const map_pointer endNewMap = newMap + n;
             while (endCopy < endNewMap)
             	*endCopy++ = allocateRow();
 
             // Fix begin and end iterators
-        	std::cout << std::endl << "==================================" << std::endl
-        			  << "currentItem: " << myEnd.currentItem << std::endl
-        			  << "rowBegin:    " << myEnd.rowBegin << std::endl
-        			  << "rowEnd:      " << myEnd.rowEnd << std::endl;
+        	std::cout << std::endl 
+        			  << "==================================" << std::endl
+        			  << "|| currentItem: " << myEnd.currentItem << std::endl
+        			  << "|| rowBegin:    " << myEnd.rowBegin << std::endl
+        			  << "|| rowEnd:      " << myEnd.rowEnd << std::endl;
             myBegin.setRow(beginNewMap);
-        	myEnd.setRow(beginNewMap + n);
+        	myEnd.setRow(beginNewMap + endOffset);
         	std::cout << "----------------------------------" << std::endl
-        			  << "currentItem: " << myEnd.currentItem << std::endl
-        			  << "rowBegin:    " << myEnd.rowBegin << std::endl
-        			  << "rowEnd:      " << myEnd.rowEnd << std::endl
+        			  << "|| currentItem: " << myEnd.currentItem << std::endl
+        			  << "|| rowBegin:    " << myEnd.rowBegin << std::endl
+        			  << "|| rowEnd:      " << myEnd.rowEnd << std::endl
         			  << "==================================" << std::endl;
 
             assert(myBegin.valid());    
@@ -251,14 +254,14 @@ class MyDeque {
             while(newMap != firstStop)
                 *newMap++ = allocateRow();
             newMap = std::copy(myMap, myMap + myMapSize, newMap);
-            // myBegin.setRow(newMap - myMapSize);
-            // myEnd.setRow(newMap - 1);
+            while(newMap != e)
+                *newMap++ = allocateRow();
+
+            // Fix iterators
 		    myBegin.setRow(firstStop);
             myEnd.currentRow = firstStop + myMapSize;
             assert(myBegin.valid());
             assert(myEnd.valid());
-            while(newMap != e)
-                *newMap++ = allocateRow();
         }
 
         /**
@@ -284,8 +287,11 @@ class MyDeque {
             // Destroy old map
             deallocateMap(myMap, myMapSize);
 
+            // Finally swap the maps and delete the old one
             myMap = newMap;
             myMapSize = n;
+
+            // Set the total iterators and assert validity
             totalBegin = iterator(*myMap, myMap);
             totalEnd = iterator(*(myMap + n), myMap + n);
             assert(valid());

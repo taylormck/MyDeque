@@ -79,7 +79,7 @@ class MyDeque {
 		typedef typename allocator_type::const_reference const_reference;
 
 		typedef typename allocator_type::template rebind<pointer>::other map_allocator_type;
-        typedef typename map_allocator_type::pointer row_pointer;
+        typedef typename map_allocator_type::pointer map_pointer;
 
 	public:
 		/**
@@ -158,7 +158,7 @@ class MyDeque {
 
 			private:
                 pointer currentItem;
-                row_pointer currentRow;
+                map_pointer currentRow;
                 pointer rowBegin;
                 pointer rowEnd;
 
@@ -175,7 +175,7 @@ class MyDeque {
                     return true;
                 }
 
-                void setRow(row_pointer newRow) {
+                void setRow(map_pointer newRow) {
                     currentRow = newRow;
                     rowBegin = *newRow;
                     rowEnd = rowBegin + ROW_SIZE;
@@ -193,7 +193,7 @@ class MyDeque {
 				/**
 				 * Creates a new iterator using a pointer to the object and the row
 				 */
-				iterator(pointer item, row_pointer row) : currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) {
+				iterator(pointer item, map_pointer row) : currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) {
                     assert(valid());
                 }
 
@@ -270,7 +270,15 @@ class MyDeque {
                             -((-newPosition - 1) / ROW_SIZE) - 1;
 
                        	difference_type offset = newPosition - newRow * ROW_SIZE;
+                       	std::cout << "|| Setting new row" << std::endl
+                       			  << "|| currentRow = " << currentRow << std::endl
+                       			  << "|| newRow     = " << newRow << std::endl
+                       			  << "|| result     = " << currentRow + newRow << std::endl;
                         setRow(currentRow + newRow);
+                       	std::cout << "|| oldItem    = " << currentItem << std::endl
+                       			  << "|| rowBegin   = " << rowBegin << std::endl
+                       			  << "|| offset     = " << offset << std::endl
+                       			  << "|| newItem    = " << rowBegin + offset << std::endl;
                         currentItem = rowBegin + offset;
                     }
 					assert(valid());
@@ -338,7 +346,7 @@ class MyDeque {
 
 			private:
                 pointer currentItem;
-                row_pointer currentRow;
+                map_pointer currentRow;
                 pointer rowBegin;
                 pointer rowEnd;
 
@@ -353,7 +361,7 @@ class MyDeque {
                     return true;
                 }
 
-                void setRow(row_pointer newRow) {
+                void setRow(map_pointer newRow) {
                     currentRow = newRow;
                     rowBegin = *newRow;
                     rowEnd = rowBegin + ROW_SIZE;
@@ -364,7 +372,7 @@ class MyDeque {
 				 * Create a new const_iterator using a pointer to the data type
 				 * and its row
 				 */
-				const_iterator(pointer item, row_pointer row) :
+				const_iterator(pointer item, map_pointer row) :
                         currentItem(item), currentRow(row), rowBegin(*row), rowEnd(rowBegin + ROW_SIZE) {
                     assert(valid());
                 }
@@ -472,7 +480,7 @@ class MyDeque {
 		allocator_type myAllocator;
 		map_allocator_type myMapAllocator;
 		
-		row_pointer myMap;
+		map_pointer myMap;
 
         iterator myBegin;
         iterator myEnd;
@@ -490,7 +498,6 @@ class MyDeque {
 				return false;
             if (myMapSize < 1)
                 return false;
-
 			return true;
 		}
 
@@ -499,16 +506,16 @@ class MyDeque {
 		 * MyDeque yet
 		 */
 		 bool atEnd() const {
-		 	std::cout << "|| Got to atEnd" << std::endl;
-		 	if (myEnd.currentRow == myMap + myMapSize) {
-		 		std::cout << "|| currentRow == myMap + myMapSize" << std::endl;
+		 	bool onLastRow = myEnd.currentRow == myMap + myMapSize - 1;
+		 	bool onLastElementInRow = myEnd.currentItem == myEnd.rowEnd - 1;
+		 	if (onLastRow) {
+		 		std::cout << "|| onLastRow" << std::endl;
 		 	}
-		 	if (myEnd.currentItem >= myEnd.rowEnd) {
-		 		std::cout << "|| currentItem >= rowEnd - 1" << std::endl;
+		 	if (onLastElementInRow) {
+		 		std::cout << "|| onLastElementInRow" << std::endl;
 		 	}
 
-		 	return ((myEnd.currentRow == myMap + myMapSize) &&
-		 			(myEnd.currentItem >= myEnd.rowEnd));
+		 	return (onLastRow && onLastElementInRow);
 		 }
 
 		/**
@@ -537,14 +544,14 @@ class MyDeque {
         /**
          * Helper function to allocate a map
          */
-        row_pointer allocateMap(size_type n) {
+        map_pointer allocateMap(size_type n) {
             return myMapAllocator.allocate(n);
         }
 
         /**
          * Helper function to deallocate a map
          */
-        void deallocateMap(row_pointer map, size_type n) {
+        void deallocateMap(map_pointer map, size_type n) {
             myMapAllocator.deallocate(map, n);
         }
 
@@ -564,47 +571,53 @@ class MyDeque {
          */
          void addRowFront() {
          	// allocate and initialize the new outer array
-         	row_pointer newMap = allocateMap(myMapSize + 1);
+         	map_pointer newMap = allocateMap(myMapSize + 1);
          	uninitialized_copy(myMapAllocator, myMap, myMap + myMapSize, newMap + 1);
          	newMap[0] = allocateRow();
+
+         	// Fix iterators
+         	difference_type beginOffset = myBegin.currentRow - myMap + 1;
+         	difference_type endOffset = myEnd.currentRow - myMap + 1;
+         	myBegin.setRow(newMap + beginOffset);
+         	myEnd.setRow(newMap + endOffset);
 
          	// Destroy the old map
          	deallocateMap(myMap, myMapSize);
          	myMap = newMap;
          	++myMapSize;
 
-         	// Fix iterators
-         	myBegin.setRow(myMap + 1);
-         	myEnd.setRow(myMap + myMapSize);
+         	assert(valid());
          }
 
         /**
          * Add a row to the back of the array
          */
          void addRowBack() {
-         	std::cout << "|| Entering addRowBack" << std::endl;
          	// allocate and initialize the new outer array
-         	row_pointer newMap = allocateMap(myMapSize + 1);
-         	std::cout << "|| Successfully allocated another map" << std::endl;
+         	map_pointer newMap = allocateMap(myMapSize + 1);
          	uninitialized_copy(myMapAllocator, myMap, myMap + myMapSize, newMap);
-         	newMap[myMapSize + 1] = allocateRow();
+         	newMap[myMapSize] = allocateRow();
+
+         	// Fix iterators
+         	difference_type beginOffset = myBegin.currentRow - myMap;
+         	difference_type endOffset = myEnd.currentRow - myMap;
+         	myBegin.setRow(newMap + beginOffset);
+         	myEnd.setRow(newMap + endOffset);
 
          	// Destroy the old map
          	deallocateMap(myMap, myMapSize);
          	myMap = newMap;
          	++myMapSize;
 
-         	// Fix iterators
-         	myBegin.setRow(myMap);
-         	myEnd.setRow(myMap + myMapSize - 1);
-         }
+         	assert(valid());
+        }
 
         /**
          * Deletes the map and all the data
          */
         void clearMap() {
             destroy(myAllocator, myBegin, myEnd);
-            for (row_pointer i = myMap; i < myMap + myMapSize; ++i)
+            for (map_pointer i = myMap; i < myMap + myMapSize; ++i)
             	deallocateRow(*i);
             deallocateMap(myMap, myMapSize);
         }
@@ -840,7 +853,9 @@ class MyDeque {
 		 */
 		void push_back(const_reference v) {
 			assert(valid());
-            std::cout << std::endl
+			std::cout << std::endl
+					  << "||===============================" << std::endl
+					  << "|| push_back at size  = " << mySize << std::endl
              		  << "||===============================" << std::endl
              		  << "|| myEnd" << std::endl
              		  << "||-------------------------------" << std::endl
@@ -848,24 +863,29 @@ class MyDeque {
              		  << "|| currentItem = " << myEnd.currentItem << std::endl
              		  << "|| rowBegin    = " << myEnd.rowBegin << std::endl
              		  << "|| rowEnd      = " << myEnd.rowEnd << std::endl
+             		  << "|| row index   = " << myEnd.currentItem - myEnd.rowBegin << std::endl
              		  << "||-------------------------------" << std::endl;
+            myAllocator.construct(&*myEnd, v);
             if(atEnd()) {
             	std::cout << "||-------------------------------" << std::endl
-            			  << "|| atEnd returned true" << std::endl
-             		  	  << "||-------------------------------" << std::endl
-            			  << "|| attempting addRowBack"  << std::endl;
+            	     	  << "|| atEnd returned true" << std::endl
+              		  	  << "||-------------------------------" << std::endl
+            	 		  << "|| attempting addRowBack"  << std::endl;
                 addRowBack();
             	std::cout << "|| returned from addRowBack" << std::endl;
             }
+            else {
+	            std::cout << "||-------------------------------" << std::endl
+	            		  << "|| atEnd returned false" << std::endl;
+            }
             std::cout << "||-------------------------------" << std::endl
-            		  << "|| atEnd returned false" << std::endl
-             		  << "||-------------------------------" << std::endl
              		  << "|| currentRow  = " << myEnd.currentRow << std::endl
              		  << "|| currentItem = " << myEnd.currentItem << std::endl
              		  << "|| rowBegin    = " << myEnd.rowBegin << std::endl
              		  << "|| rowEnd      = " << myEnd.rowEnd << std::endl
+             		  << "|| row index   = " << myEnd.currentItem - myEnd.rowBegin << std::endl
              		  << "||===============================" << std::endl;
-            myAllocator.construct(&*myEnd, v);
+            assert(myEnd.valid());
             ++myEnd;
 			++mySize;
 			assert(valid());

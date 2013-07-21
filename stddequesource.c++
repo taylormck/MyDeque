@@ -584,15 +584,15 @@ private:                        // helper functions for assign()
   template <class _InputIterator>
   void _M_assign_dispatch(_InputIterator __first, _InputIterator __last,
                           __false_type) {
-    _M_assign_auitem(__first, __last, __ITERATOR_CATEGORY(__first));
+    _M_assign_aux(__first, __last, __ITERATOR_CATEGORY(__first));
   }
 
   template <class _InputIterator>
-  void _M_assign_auitem(_InputIterator __first, _InputIterator __last,
+  void _M_assign_aux(_InputIterator __first, _InputIterator __last,
                      input_iterator_tag);
 
   template <class _ForwardIterator>
-  void _M_assign_auitem(_ForwardIterator __first, _ForwardIterator __last,
+  void _M_assign_aux(_ForwardIterator __first, _ForwardIterator __last,
                      forward_iterator_tag) {
     size_type __len = 0;
     distance(__first, __last, __len);
@@ -616,7 +616,7 @@ public:                         // push_* and pop_*
       ++_M_finish.currentItem;
     }
     else
-      _M_push_back_auitem(__t);
+      _M_push_back_aux(__t);
   }
 
   void push_back() {
@@ -625,7 +625,7 @@ public:                         // push_* and pop_*
       ++_M_finish.currentItem;
     }
     else
-      _M_push_back_auitem();
+      _M_push_back_aux();
   }
 
   void push_front(const value_type& __t) {
@@ -634,7 +634,7 @@ public:                         // push_* and pop_*
       --_M_start.currentItem;
     }
     else
-      _M_push_front_auitem(__t);
+      _M_push_front_aux(__t);
   }
 
   void push_front() {
@@ -643,7 +643,7 @@ public:                         // push_* and pop_*
       --_M_start.currentItem;
     }
     else
-      _M_push_front_auitem();
+      _M_push_front_aux();
   }
 
 
@@ -653,7 +653,7 @@ public:                         // push_* and pop_*
       destroy(_M_finish.currentItem);
     }
     else
-      _M_pop_back_auitem();
+      _M_pop_back_aux();
   }
 
   void pop_front() {
@@ -662,7 +662,7 @@ public:                         // push_* and pop_*
       ++_M_start.currentItem;
     }
     else 
-      _M_pop_front_auitem();
+      _M_pop_front_aux();
   }
 
 public:                         // Insert
@@ -679,7 +679,7 @@ public:                         // Insert
       return tmp;
     }
     else {
-      return _M_insert_auitem(position, item);
+      return _M_insert_aux(position, item);
     }
   }
 
@@ -769,12 +769,12 @@ protected:                        // Internal construction/destruction
 
 protected:                        // Internal push_* and pop_*
 
-  void _M_push_back_auitem(const value_type&);
-  void _M_push_back_auitem();
-  void _M_push_front_auitem(const value_type&);
-  void _M_push_front_auitem();
-  void _M_pop_back_auitem();
-  void _M_pop_front_auitem();
+  void _M_push_back_aux(const value_type&);
+  void _M_push_back_aux();
+  void _M_push_front_aux(const value_type&);
+  void _M_push_front_aux();
+  void _M_pop_back_aux();
+  void _M_pop_front_aux();
 
 protected:                        // Internal insert functions
 
@@ -791,24 +791,24 @@ protected:                        // Internal insert functions
 
 #endif /* __STL_MEMBER_TEMPLATES */
 
-  iterator _M_insert_auitem(iterator rowToDeleteos, const value_type& item);
-  iterator _M_insert_auitem(iterator rowToDeleteos);
-  void _M_insert_auitem(iterator rowToDeleteos, size_type n, const value_type& item);
+  iterator _M_insert_aux(iterator rowToDeleteos, const value_type& item);
+  iterator _M_insert_aux(iterator rowToDeleteos);
+  void _M_insert_aux(iterator rowToDeleteos, size_type n, const value_type& item);
 
 #ifdef __STL_MEMBER_TEMPLATES  
 
   template <class _ForwardIterator>
-  void _M_insert_auitem(iterator rowToDeleteos, 
+  void _M_insert_aux(iterator rowToDeleteos, 
                      _ForwardIterator __first, _ForwardIterator __last,
                      size_type n);
 
 #else /* __STL_MEMBER_TEMPLATES */
   
-  void _M_insert_auitem(iterator rowToDeleteos,
+  void _M_insert_aux(iterator rowToDeleteos,
                      const value_type* __first, const value_type* __last,
                      size_type n);
 
-  void _M_insert_auitem(iterator rowToDeleteos, 
+  void _M_insert_aux(iterator rowToDeleteos, 
                      const_iterator __first, const_iterator __last,
                      size_type n);
  
@@ -857,7 +857,7 @@ protected:                      // Allocation of myMap and nodes
 template <class MyType, class Allocator>
 template <class _InputIter>
 void deque<MyType, Allocator>
-  ::_M_assign_auitem(_InputIter __first, _InputIter __last, input_iterator_tag)
+  ::_M_assign_aux(_InputIter __first, _InputIter __last, input_iterator_tag)
 {
   iterator __cur = begin();
   for ( ; __first != __last && __cur != end(); ++__cur, ++__first)
@@ -892,7 +892,7 @@ void deque<MyType, Allocator>::_M_fill_insert(iterator rowToDeleteos,
                                   new_finish.currentRow + 1));    
   }
   else 
-    _M_insert_auitem(rowToDeleteos, n, item);
+    _M_insert_aux(rowToDeleteos, n, item);
 }
 
 #ifndef __STL_MEMBER_TEMPLATES  
@@ -920,7 +920,7 @@ void deque<MyType, Allocator>::insert(iterator rowToDeleteos,
                                   new_finish.currentRow + 1));
   }
   else
-    _M_insert_auitem(rowToDeleteos, __first, __last, n);
+    _M_insert_aux(rowToDeleteos, __first, __last, n);
 }
 
 template <class MyType, class Allocator>
@@ -946,7 +946,7 @@ void deque<MyType,Allocator>::insert(iterator rowToDeleteos,
                  new_finish.currentRow + 1));
   }
   else
-    _M_insert_auitem(rowToDeleteos, __first, __last, n);
+    _M_insert_aux(rowToDeleteos, __first, __last, n);
 }
 
 #endif /* __STL_MEMBER_TEMPLATES */
@@ -1057,7 +1057,7 @@ void deque<MyType,Allocator>::_M_range_initialize(_ForwardIterator __first,
 
 // Called only if _M_finish.currentItem == _M_finish.rowEnd - 1.
 template <class MyType, class Allocator>
-void deque<MyType,Allocator>::_M_push_back_auitem(const value_type& __t)
+void deque<MyType,Allocator>::_M_push_back_aux(const value_type& __t)
 {
   value_type __t_copy = __t;
   _M_reserve_map_at_back();
@@ -1072,7 +1072,7 @@ void deque<MyType,Allocator>::_M_push_back_auitem(const value_type& __t)
 
 // Called only if _M_finish.currentItem == _M_finish.rowEnd - 1.
 template <class MyType, class Allocator>
-void deque<MyType,Allocator>::_M_push_back_auitem()
+void deque<MyType,Allocator>::_M_push_back_aux()
 {
   _M_reserve_map_at_back();
   *(_M_finish.currentRow + 1) = allocateRow();
@@ -1086,7 +1086,7 @@ void deque<MyType,Allocator>::_M_push_back_auitem()
 
 // Called only if _M_start.currentItem == _M_start.rowBegin.
 template <class MyType, class Allocator>
-void  deque<MyType,Allocator>::_M_push_front_auitem(const value_type& __t)
+void  deque<MyType,Allocator>::_M_push_front_aux(const value_type& __t)
 {
   value_type __t_copy = __t;
   _M_reserve_map_at_front();
@@ -1101,7 +1101,7 @@ void  deque<MyType,Allocator>::_M_push_front_auitem(const value_type& __t)
 
 // Called only if _M_start.currentItem == _M_start.rowBegin.
 template <class MyType, class Allocator>
-void deque<MyType,Allocator>::_M_push_front_auitem()
+void deque<MyType,Allocator>::_M_push_front_aux()
 {
   _M_reserve_map_at_front();
   *(_M_start.currentRow - 1) = allocateRow();
@@ -1115,7 +1115,7 @@ void deque<MyType,Allocator>::_M_push_front_auitem()
 
 // Called only if _M_finish.currentItem == _M_finish.rowBegin.
 template <class MyType, class Allocator>
-void deque<MyType,Allocator>::_M_pop_back_auitem()
+void deque<MyType,Allocator>::_M_pop_back_aux()
 {
   deallocateRow(_M_finish.rowBegin);
   _M_finish.setRow(_M_finish.currentRow - 1);
@@ -1128,7 +1128,7 @@ void deque<MyType,Allocator>::_M_pop_back_auitem()
 // function), and if _M_start.currentItem == _M_start.rowEnd, then the deque 
 // must have at least two nodes.
 template <class MyType, class Allocator>
-void deque<MyType,Allocator>::_M_pop_front_auitem()
+void deque<MyType,Allocator>::_M_pop_front_aux()
 {
   destroy(_M_start.currentItem);
   deallocateRow(_M_start.rowBegin);
@@ -1171,14 +1171,14 @@ deque<MyType,Allocator>::insert(iterator rowToDeleteos,
                                   new_finish.currentRow + 1));
   }
   else
-    _M_insert_auitem(rowToDeleteos, __first, __last, n);
+    _M_insert_aux(rowToDeleteos, __first, __last, n);
 }
 
 #endif /* __STL_MEMBER_TEMPLATES */
 
 template <class MyType, class Allocator>
 typename deque<MyType, Allocator>::iterator
-deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos, const value_type& item)
+deque<MyType,Allocator>::_M_insert_aux(iterator rowToDeleteos, const value_type& item)
 {
   difference_type __indeitem = rowToDeleteos - _M_start;
   value_type item_copy = item;
@@ -1208,7 +1208,7 @@ deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos, const value_ty
 
 template <class MyType, class Allocator>
 typename deque<MyType,Allocator>::iterator 
-deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos)
+deque<MyType,Allocator>::_M_insert_aux(iterator rowToDeleteos)
 {
   difference_type __indeitem = rowToDeleteos - _M_start;
   if (__indeitem < size() / 2) {
@@ -1236,7 +1236,7 @@ deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos)
 }
 
 template <class MyType, class Allocator>
-void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
+void deque<MyType,Allocator>::_M_insert_aux(iterator rowToDeleteos,
                                       size_type n,
                                       const value_type& item)
 {
@@ -1293,7 +1293,7 @@ void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
 #ifdef __STL_MEMBER_TEMPLATES  
 
 template <class MyType, class Allocator> template <class _ForwardIterator>
-void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
+void deque<MyType,Allocator>::_M_insert_aux(iterator rowToDeleteos,
                                       _ForwardIterator __first,
                                       _ForwardIterator __last,
                                       size_type n)
@@ -1353,7 +1353,7 @@ void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
 #else /* __STL_MEMBER_TEMPLATES */
 
 template <class MyType, class Allocator>
-void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
+void deque<MyType,Allocator>::_M_insert_aux(iterator rowToDeleteos,
                                       const value_type* __first,
                                       const value_type* __last,
                                       size_type n)
@@ -1410,7 +1410,7 @@ void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
 }
 
 template <class MyType, class Allocator>
-void deque<MyType,Allocator>::_M_insert_auitem(iterator rowToDeleteos,
+void deque<MyType,Allocator>::_M_insert_aux(iterator rowToDeleteos,
                                       const_iterator __first,
                                       const_iterator __last,
                                       size_type n)
@@ -1525,7 +1525,7 @@ void deque<MyType,Allocator>::_M_reallocate_map(size_type nodes_to_add,
   }
   else {
     size_type new_map_size = 
-      myMapSize + maitem(MmapSize, nodes_to_add) + 2;
+      myMapSize + max(MmapSize, nodes_to_add) + 2;
 
     MapPointer new_map = allocateMap(new_map_size);
     new_nstart = new_map + (new_map_size - new_num_nodes) / 2

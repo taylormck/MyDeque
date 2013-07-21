@@ -81,26 +81,6 @@ class MyDeque {
 		typedef typename allocator_type::template rebind<pointer>::other map_allocator_type;
         typedef typename map_allocator_type::pointer map_pointer;
 
-	public:
-		/**
-		 * Compares the deques for equality
-		 */
-		friend bool operator ==(const MyDeque& lhs, const MyDeque& rhs) {
-            if (lhs.size() != rhs.size())
-                return false;
-			return std::equal(lhs.myBegin, lhs.myEnd, rhs.myBegin);
-		}
-
-		/**
-		 * Returns true if lhs is lexicographically less than rhs
-		 */
-		friend bool operator <(const MyDeque& lhs, const MyDeque& rhs) {
-            if (lhs.size() < rhs.size())
-                return true;
-            return std::lexicographical_compare(lhs.myBegin, lhs.myEnd,
-                                                rhs.myBegin, rhs.myEnd);
-		}
-
 	private:
 		const static unsigned int LOG_ROW_SIZE = 7;
 		const static difference_type ROW_SIZE = 1 << LOG_ROW_SIZE;
@@ -464,6 +444,26 @@ class MyDeque {
 				}
 		};
 
+	public:
+		/**
+		 * Compares the deques for equality
+		 */
+		friend bool operator ==(const MyDeque& lhs, const MyDeque& rhs) {
+            if (lhs.size() != rhs.size())
+                return false;
+			return std::equal(lhs.myBegin, lhs.myEnd, rhs.myBegin);
+		}
+
+		/**
+		 * Returns true if lhs is lexicographically less than rhs
+		 */
+		friend bool operator <(const MyDeque& lhs, const MyDeque& rhs) {
+            if (lhs.size() < rhs.size())
+                return true;
+            return std::lexicographical_compare(lhs.myBegin, lhs.myEnd,
+                                                rhs.myBegin, rhs.myEnd);
+		}
+
 	private:
 
 		size_type mySize;
@@ -663,11 +663,8 @@ class MyDeque {
 		/**
 		 * Set this MyDeque equal to another
 		 */
-		MyDeque& operator =(const MyDeque& rhs) {
-            clear();
-			for (iterator i = rhs.myBegin; i < rhs.myEnd; ++i)
-				push_back(*i);
-			assert(valid());
+		MyDeque& operator =(MyDeque rhs) {
+            swap(rhs);
 			return *this;
 		}
 
@@ -733,9 +730,8 @@ class MyDeque {
 		 * Delete all data from the MyDeque
 		 */
 		void clear() {
-			clearMap();
-			initMap();
-			mySize = 0;
+			while(mySize > 0)
+				pop_back();
 			assert(valid());
 		}
 
@@ -838,10 +834,10 @@ class MyDeque {
 		 */
 		void push_back(const_reference v) {
 			assert(valid());
-            myAllocator.construct(&*myEnd, v);
             if(atEnd()) {
                 addRowBack();
             }
+            myAllocator.construct(&*myEnd, v);
             assert(myEnd.valid());
             ++myEnd;
 			++mySize;

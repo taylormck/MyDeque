@@ -485,7 +485,7 @@ public:                         // Constructor, destructor.
   deque(size_type n, const value_type& __value,
         const allocator_type& a = allocator_type()) : _Base(a, n)
     { _M_fill_initialize(__value); }
-  eitemplicit deque(size_type n) : _Base(allocator_type(), n)
+  explicit deque(size_type n) : _Base(allocator_type(), n)
     { _M_fill_initialize(value_type()); }
 
 #ifdef __STL_MEMBER_TEMPLATES

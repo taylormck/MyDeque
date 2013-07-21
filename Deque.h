@@ -270,15 +270,7 @@ class MyDeque {
                             -((-newPosition - 1) / ROW_SIZE) - 1;
 
                        	difference_type offset = newPosition - newRow * ROW_SIZE;
-                       	// std::cout << "|| Setting new row" << std::endl
-                       	// 		  << "|| currentRow = " << currentRow << std::endl
-                       	// 		  << "|| newRow     = " << newRow << std::endl
-                       	// 		  << "|| result     = " << currentRow + newRow << std::endl;
                         setRow(currentRow + newRow);
-                       	// std::cout << "|| oldItem    = " << currentItem << std::endl
-                       	// 		  << "|| rowBegin   = " << rowBegin << std::endl
-                       	// 		  << "|| offset     = " << offset << std::endl
-                       	// 		  << "|| newItem    = " << rowBegin + offset << std::endl;
                         currentItem = rowBegin + offset;
                     }
 					assert(valid());
@@ -508,13 +500,6 @@ class MyDeque {
 		 bool atEnd() const {
 		 	bool onLastRow = myEnd.currentRow == myMap + myMapSize - 1;
 		 	bool onLastElementInRow = myEnd.currentItem == myEnd.rowEnd - 1;
-		 	if (onLastRow) {
-		 		// std::cout << "|| onLastRow" << std::endl;
-		 	}
-		 	if (onLastElementInRow) {
-		 		// std::cout << "|| onLastElementInRow" << std::endl;
-		 	}
-
 		 	return (onLastRow && onLastElementInRow);
 		 }
 
@@ -853,38 +838,10 @@ class MyDeque {
 		 */
 		void push_back(const_reference v) {
 			assert(valid());
-			// std::cout << std::endl
-			// 		  << "||===============================" << std::endl
-			// 		  << "|| push_back at size  = " << mySize << std::endl
-   //           		  << "||===============================" << std::endl
-   //           		  << "|| myEnd" << std::endl
-   //           		  << "||-------------------------------" << std::endl
-   //           		  << "|| currentRow  = " << myEnd.currentRow << std::endl
-   //           		  << "|| currentItem = " << myEnd.currentItem << std::endl
-   //           		  << "|| rowBegin    = " << myEnd.rowBegin << std::endl
-   //           		  << "|| rowEnd      = " << myEnd.rowEnd << std::endl
-   //           		  << "|| row index   = " << myEnd.currentItem - myEnd.rowBegin << std::endl
-             		  // << "||-------------------------------" << std::endl;
             myAllocator.construct(&*myEnd, v);
             if(atEnd()) {
-            	// std::cout << "||-------------------------------" << std::endl
-            	//      	  << "|| atEnd returned true" << std::endl
-             //  		  	  << "||-------------------------------" << std::endl
-            	//  		  << "|| attempting addRowBack"  << std::endl;
                 addRowBack();
-            	// std::cout << "|| returned from addRowBack" << std::endl;
             }
-            // else {
-	           //  std::cout << "||-------------------------------" << std::endl
-	           //  		  << "|| atEnd returned false" << std::endl;
-            // }
-            // std::cout << "||-------------------------------" << std::endl
-            //  		  << "|| currentRow  = " << myEnd.currentRow << std::endl
-            //  		  << "|| currentItem = " << myEnd.currentItem << std::endl
-            //  		  << "|| rowBegin    = " << myEnd.rowBegin << std::endl
-            //  		  << "|| rowEnd      = " << myEnd.rowEnd << std::endl
-            //  		  << "|| row index   = " << myEnd.currentItem - myEnd.rowBegin << std::endl
-            //  		  << "||===============================" << std::endl;
             assert(myEnd.valid());
             ++myEnd;
 			++mySize;

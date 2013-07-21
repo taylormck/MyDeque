@@ -868,7 +868,6 @@ class MyDeque {
 			--mySize;
 			--myEnd;
 			myAllocator.destroy(&*myEnd);
-			// TODO <your code>
 			assert(valid());
 		}
 
@@ -877,6 +876,8 @@ class MyDeque {
 		 */
 		void pop_front() {
 			--mySize;
+			myAllocator.destroy(&*myBegin);
+			++myBegin;
 			// TODO <your code>
 			assert(valid());
 		}
